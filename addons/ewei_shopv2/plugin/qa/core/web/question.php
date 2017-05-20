@@ -1,5 +1,5 @@
 <?php
-//weichengtech
+
 if (!defined('IN_IA')) {
 	exit('Access Denied');
 }
@@ -23,20 +23,24 @@ class Question_EweiShopV2Page extends PluginWebPage
 			$params[':title'] = '%' . trim($_GPC['keyword']) . '%';
 		}
 
+
 		if ($_GPC['status'] != '') {
 			$condition .= ' AND q.status=:status';
 			$params[':status'] = intval($_GPC['status']);
 		}
+
 
 		if ($_GPC['isrecommand'] != '') {
 			$condition .= ' AND q.isrecommand=:isrecommand';
 			$params[':isrecommand'] = intval($_GPC['isrecommand']);
 		}
 
+
 		if ($_GPC['cate'] != '') {
 			$condition .= ' AND q.cate=:cate';
 			$params[':cate'] = intval($_GPC['cate']);
 		}
+
 
 		$sql = 'SELECT q.*, c.name as catename FROM ' . tablename('ewei_shop_qa_question') . ' q left join' . tablename('ewei_shop_qa_category') . ' c on c.id=q.cate where  1 and ' . $condition . ' ORDER BY q.displayorder DESC,q.id DESC LIMIT ' . (($pindex - 1) * $psize) . ',' . $psize;
 		$list = pdo_fetchall($sql, $params);
@@ -67,6 +71,7 @@ class Question_EweiShopV2Page extends PluginWebPage
 			$item['content'] = iunserializer($item['content']);
 		}
 
+
 		$category = pdo_fetchall('select * from ' . tablename('ewei_shop_qa_category') . ' where uniacid=:uniacid ', array(':uniacid' => $_W['uniacid']));
 
 		if ($_W['ispost']) {
@@ -77,7 +82,7 @@ class Question_EweiShopV2Page extends PluginWebPage
 				pdo_update('ewei_shop_qa_question', $data, array('id' => $id));
 				plog('qa.category.edit', '修改积分商城分类 ID: ' . $id);
 			}
-			else {
+			 else {
 				$data['createtime'] = time();
 				pdo_insert('ewei_shop_qa_question', $data);
 				$id = pdo_insertid();
@@ -86,6 +91,7 @@ class Question_EweiShopV2Page extends PluginWebPage
 
 			show_json(1, array('url' => webUrl('qa/question/edit', array('id' => $id))));
 		}
+
 
 		include $this->template();
 	}
@@ -100,6 +106,7 @@ class Question_EweiShopV2Page extends PluginWebPage
 		if (empty($item)) {
 			show_json(0, '抱歉，问题不存在或是已经被删除！', array('url' => webUrl('qa/question')));
 		}
+
 
 		pdo_delete('ewei_shop_qa_question', array('id' => $id));
 		plog('qa.question.delete', '删除问题 ID: ' . $id . ' 标题: ' . $item['title'] . ' ');
@@ -119,6 +126,7 @@ class Question_EweiShopV2Page extends PluginWebPage
 			plog('qa.question.edit', '修改分类排序 ID: ' . $item['id'] . ' 标题: ' . $item['title'] . ' 排序: ' . $displayorder . ' ');
 		}
 
+
 		show_json(1);
 	}
 
@@ -129,14 +137,15 @@ class Question_EweiShopV2Page extends PluginWebPage
 		$id = intval($_GPC['id']);
 
 		if (empty($id)) {
-			$id = (is_array($_GPC['ids']) ? implode(',', $_GPC['ids']) : 0);
+			$id = ((is_array($_GPC['ids']) ? implode(',', $_GPC['ids']) : 0));
 		}
+
 
 		$items = pdo_fetchall('SELECT id,title FROM ' . tablename('ewei_shop_qa_question') . ' WHERE id in( ' . $id . ' ) AND uniacid=' . $_W['uniacid']);
 
-		foreach ($items as $item) {
+		foreach ($items as $item ) {
 			pdo_update('ewei_shop_qa_question', array('status' => intval($_GPC['status'])), array('id' => $item['id']));
-			plog('qa.question.edit', ('修改问题显示状态<br/>ID: ' . $item['id'] . '<br/>标题: ' . $item['title'] . '<br/>状态: ' . $_GPC['status']) == 1 ? '显示' : '隐藏');
+			plog('qa.question.edit', (('修改问题显示状态<br/>ID: ' . $item['id'] . '<br/>标题: ' . $item['title'] . '<br/>状态: ' . $_GPC['status']) == 1 ? '显示' : '隐藏'));
 		}
 
 		show_json(1);
@@ -149,18 +158,20 @@ class Question_EweiShopV2Page extends PluginWebPage
 		$id = intval($_GPC['id']);
 
 		if (empty($id)) {
-			$id = (is_array($_GPC['ids']) ? implode(',', $_GPC['ids']) : 0);
+			$id = ((is_array($_GPC['ids']) ? implode(',', $_GPC['ids']) : 0));
 		}
+
 
 		$items = pdo_fetchall('SELECT id,title FROM ' . tablename('ewei_shop_qa_question') . ' WHERE id in( ' . $id . ' ) AND uniacid=' . $_W['uniacid']);
 
-		foreach ($items as $item) {
+		foreach ($items as $item ) {
 			pdo_update('ewei_shop_qa_question', array('isrecommand' => intval($_GPC['isrecommand'])), array('id' => $item['id']));
-			plog('qa.question.edit', ('修改问题显示状态<br/>ID: ' . $item['id'] . '<br/>标题: ' . $item['title'] . '<br/>状态: ' . $_GPC['isrecommand']) == 1 ? '推荐' : '取消推荐');
+			plog('qa.question.edit', (('修改问题显示状态<br/>ID: ' . $item['id'] . '<br/>标题: ' . $item['title'] . '<br/>状态: ' . $_GPC['isrecommand']) == 1 ? '推荐' : '取消推荐'));
 		}
 
 		show_json(1);
 	}
 }
+
 
 ?>

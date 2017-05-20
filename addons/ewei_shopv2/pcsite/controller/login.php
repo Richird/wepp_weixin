@@ -1,5 +1,5 @@
 <?php
-//weichengtech
+
 if (!defined('ES_PATH')) {
 	exit('Access Denied');
 }
@@ -33,12 +33,14 @@ class LoginController extends Controller
 			exit();
 		}
 
+
 		if (empty($username)) {
 			$data['msg'] = '请输入要登录的用户名';
 			$data['name'] = 'password';
 			echo json_encode($data);
 			exit();
 		}
+
 
 		$member['username'] = $username;
 		$member['password'] = $_GPC['password'];
@@ -50,6 +52,7 @@ class LoginController extends Controller
 			exit();
 		}
 
+
 		$record = user_single($member);
 
 		if (!empty($record)) {
@@ -60,6 +63,7 @@ class LoginController extends Controller
 				exit();
 			}
 
+
 			if ((0 < $record['endtime']) && ($record['endtime'] < time())) {
 				$data['msg'] = '您的账号服务时间已过，请联系网站管理员解决！';
 				$data['name'] = 'system';
@@ -67,8 +71,10 @@ class LoginController extends Controller
 				exit();
 			}
 
+
 			$founders = explode(',', $_W['config']['setting']['founder']);
 			$_W['isfounder'] = in_array($record['uid'], $founders);
+
 			if (!empty($_W['siteclose']) && empty($_W['isfounder'])) {
 				$data['msg'] = '站点已关闭，关闭原因：' . $_W['setting']['copyright']['reason'];
 				$data['name'] = 'system';
@@ -76,13 +82,14 @@ class LoginController extends Controller
 				exit();
 			}
 
+
 			$cookie = array();
 			$cookie['uid'] = $record['uid'];
 			$cookie['lastvisit'] = $record['lastvisit'];
 			$cookie['lastip'] = $record['lastip'];
 			$cookie['hash'] = md5($record['password'] . $record['salt']);
 			$session = base64_encode(json_encode($cookie));
-			isetcookie('__session', $session, !empty($_GPC['rember']) ? 7 * 86400 : 0, true);
+			isetcookie('__session', $session, (!empty($_GPC['rember']) ? 7 * 86400 : 0), true);
 			$status = array();
 			$status['uid'] = $record['uid'];
 			$status['lastvisit'] = TIMESTAMP;
@@ -94,18 +101,22 @@ class LoginController extends Controller
 				exit();
 			}
 
+
 			if (empty($forward)) {
 				$forward = $_GPC['forward'];
 			}
+
 
 			if (empty($forward)) {
 				$forward = '/web/index.php?c=account&a=display';
 			}
 
+
 			if ($record['uid'] != $_GPC['__uid']) {
 				isetcookie('__uniacid', '', -7 * 86400);
 				isetcookie('__uid', '', -7 * 86400);
 			}
+
 
 			pdo_delete('users_failed_login', array('id' => $failed['id']));
 			$result_url = '';
@@ -117,21 +128,21 @@ class LoginController extends Controller
 				if ($role === false) {
 					$result_url = '../web/index.php?c=site&a=entry&m=ewei_shopv2&do=web&r=sysset.account';
 				}
-				else {
+				 else {
 					$result_url = '../web/index.php?c=site&a=entry&m=ewei_shopv2&do=web&r=shop';
 				}
 			}
-			else {
+			 else {
 				$result_url = '../web/index.php?c=site&a=entry&m=ewei_shopv2&do=web&r=sysset.account';
 			}
 
 			$data['url'] = $result_url;
 		}
-		else {
+		 else {
 			if (empty($failed)) {
 				pdo_insert('users_failed_login', array('ip' => CLIENT_IP, 'username' => $username, 'count' => '1', 'lastupdate' => TIMESTAMP));
 			}
-			else {
+			 else {
 				pdo_update('users_failed_login', array('count' => $failed['count'] + 1, 'lastupdate' => TIMESTAMP), array('id' => $failed['id']));
 			}
 
@@ -144,5 +155,6 @@ class LoginController extends Controller
 		echo json_encode($data);
 	}
 }
+
 
 ?>

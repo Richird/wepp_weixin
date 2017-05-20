@@ -1,5 +1,5 @@
 <?php
-//weichengtech
+
 class soapval extends nusoap_base
 {
 	/**
@@ -90,5 +90,6 @@ class soapval extends nusoap_base
 		return $this->value;
 	}
 }
+
 
 ?>

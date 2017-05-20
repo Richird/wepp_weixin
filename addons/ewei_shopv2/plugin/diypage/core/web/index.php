@@ -1,12 +1,11 @@
 <?php
-//weichengtech
-if (!defined('IN_IA')) {
+if (!(defined('IN_IA'))) 
+{
 	exit('Access Denied');
 }
-
-class Index_EweiShopV2Page extends PluginWebPage
+class Index_EweiShopV2Page extends PluginWebPage 
 {
-	public function main()
+	public function main() 
 	{
 		global $_W;
 		global $_GPC;
@@ -20,13 +19,12 @@ class Index_EweiShopV2Page extends PluginWebPage
 		$setmenu = $_W['shopset']['diypage']['setmenu'];
 		include $this->template();
 	}
-
-	public function setmenu()
+	public function setmenu() 
 	{
 		global $_W;
 		global $_GPC;
-
-		if ($_W['ispost']) {
+		if ($_W['ispost']) 
+		{
 			$status = intval($_GPC['status']);
 			$data = m('common')->getPluginset('diypage');
 			$data['setmenu'] = $status;
@@ -34,5 +32,4 @@ class Index_EweiShopV2Page extends PluginWebPage
 		}
 	}
 }
-
 ?>

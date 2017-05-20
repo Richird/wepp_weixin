@@ -1,5 +1,5 @@
 <?php
-//weichengtech
+
 if (!defined('IN_IA')) {
 	exit('Access Denied');
 }
@@ -13,5 +13,6 @@ class Selecticon_EweiShopV2Page extends WebPage
 		include $this->template();
 	}
 }
+
 
 ?>

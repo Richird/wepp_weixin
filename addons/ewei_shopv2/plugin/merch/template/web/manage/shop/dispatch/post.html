@@ -185,6 +185,44 @@
     </div>
 </div>
 
+
+
+<div class="form-group-title">特殊区域设置</div>
+
+<div class="form-group">
+    <label class="col-sm-2 control-label ">类型</label>
+
+    <div class="col-sm-9 col-xs-12">
+        {ife 'shop.dispatch' $dispatch}
+        <label class='radio-inline'>
+            <input type='radio' name='isdispatcharea' value='0' {if $dispatch['isdispatcharea']==0}checked{/if} /> 不配送区域
+        </label>
+        <label class='radio-inline'>
+            <input type='radio' name='isdispatcharea' value='1' {if $dispatch['isdispatcharea']==1}checked{/if} /> 只配送区域
+        </label>
+        {else}
+        <div class='form-control-static'>{if empty($dispatch['isdispatcharea'])}不配送区域{else}只配送区域{/if}</div>
+        {/if}
+        <span class='help-block'>不配送区域:不配送选择的区域,只配送未选择的区域<br>只配送区域:只配送选择的区域,不配送未选择的区域<br>只能选择一种类型</span>
+    </div>
+</div>
+
+
+<div class="form-group">
+    <label class="col-sm-2 control-label"><span id="dispatcharea_name">{if empty($dispatch['isdispatcharea'])}不{else}只{/if}</span>配送区域</label>
+    <div class="col-sm-9 col-xs-12">
+        {ife 'shop.dispatch' $dispatch}
+        <div id="areas" class="form-control-static">{$dispatch_nodispatchareas}</div>
+        <a href="javascript:;" class="btn btn-default" onclick="selectAreas()">选择地区</a>
+        <input type="hidden" id='selectedareas' name="nodispatchareas" value="{$dispatch_nodispatchareas}" />
+        <input type="hidden" id='selectedareas_code' name="nodispatchareas_code" value="{$dispatch_nodispatchareas_code}" />
+        {else}
+        <div class='form-control-static'>{$dispatch_nodispatchareas}</div>
+        {/if}
+    </div>
+</div>
+
+
 <div class="form-group">
     <label class="col-sm-2 control-label ">状态</label>
     <div class="col-sm-9 col-xs-12">
