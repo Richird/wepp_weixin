@@ -1,4 +1,7 @@
 <?php
+//微 橙 微 信商 城系统
+?>
+<?php
 if (!(defined('IN_IA'))) 
 {
 	exit('Access Denied');
@@ -109,6 +112,112 @@ if (!(class_exists('CreditshopModel')))
 			}
 			return $dispatch;
 		}
+		public function dispatchPrice($goodsid, $addressid, $optionid = 0) 
+		{
+			global $_W;
+			global $_GPC;
+			$openid = $_W['openid'];
+			$uniacid = $_W['uniacid'];
+			$member = m('member')->getMember($openid);
+			$goods = $this->getGoods($goodsid, $member, $optionid);
+			$dispatch = 0;
+			$dispatch_array = array();
+			$address = pdo_fetch('select id,realname,mobile,address,province,city,area from ' . tablename('ewei_shop_member_address') . "\n" . '        where id=:id and uniacid=:uniacid limit 1', array(':id' => $addressid, ':uniacid' => $_W['uniacid']));
+			if ($goods['dispatchtype'] == 0) 
+			{
+				$dispatch = $goods['dispatch'];
+			}
+			else 
+			{
+				$merchid = $goods['merchid'];
+				if (empty($goods['dispatchid'])) 
+				{
+					$dispatch_data = m('dispatch')->getDefaultDispatch($merchid);
+				}
+				else 
+				{
+					$dispatch_data = m('dispatch')->getOneDispatch($goods['dispatchid']);
+				}
+				if (empty($dispatch_data)) 
+				{
+					$dispatch_data = m('dispatch')->getNewDispatch($merchid);
+				}
+				if (!(empty($dispatch_data))) 
+				{
+					$dkey = $dispatch_data['id'];
+					if (!(empty($user_city))) 
+					{
+						$citys = m('dispatch')->getAllNoDispatchAreas($dispatch_data['nodispatchareas']);
+						if (!(empty($citys))) 
+						{
+							if (in_array($user_city, $citys) && !(empty($citys))) 
+							{
+								$isnodispatch = 1;
+								$has_goodsid = 0;
+								if (!(empty($nodispatch_array['goodid']))) 
+								{
+									if (in_array($goods['goodsid'], $nodispatch_array['goodid'])) 
+									{
+										$has_goodsid = 1;
+									}
+								}
+								if ($has_goodsid == 0) 
+								{
+									$nodispatch_array['goodid'][] = $goods['id'];
+									$nodispatch_array['title'][] = $goods['title'];
+									$nodispatch_array['city'] = $user_city;
+								}
+							}
+						}
+					}
+					if (($goods['isverify'] == 0) && ($goods['goodstype'] == 0)) 
+					{
+						$areas = unserialize($dispatch_data['areas']);
+						if ($dispatch_data['calculatetype'] == 1) 
+						{
+							$param = 1;
+						}
+						else 
+						{
+							$param = $goods['weight'] * 1;
+						}
+						if (array_key_exists($dkey, $dispatch_array)) 
+						{
+							$dispatch_array[$dkey]['param'] += $param;
+						}
+						else 
+						{
+							$dispatch_array[$dkey]['data'] = $dispatch_data;
+							$dispatch_array[$dkey]['param'] = $param;
+						}
+					}
+				}
+				$dispatch_merch = array();
+				if (!(empty($dispatch_array))) 
+				{
+					foreach ($dispatch_array as $k => $v ) 
+					{
+						$dispatch_data = $dispatch_array[$k]['data'];
+						$param = $dispatch_array[$k]['param'];
+						$areas = unserialize($dispatch_data['areas']);
+						if (!(empty($address))) 
+						{
+							$dprice = m('dispatch')->getCityDispatchPrice($areas, $address, $param, $dispatch_data);
+						}
+						else if (!(empty($member['city']))) 
+						{
+							$dprice = m('dispatch')->getCityDispatchPrice($areas, $member, $param, $dispatch_data);
+						}
+						else 
+						{
+							$dprice = m('dispatch')->getDispatchPrice($param, $dispatch_data);
+						}
+						$dispatch = $dprice;
+					}
+				}
+			}
+			return $dispatch;
+		}
 		public function packetmoney($goodsid) 
 		{
 			global $_W;
@@ -154,12 +263,22 @@ if (!(class_exists('CreditshopModel')))
 			$credit = $member['credit1'];
 			$money = $member['credit2'];
 			$optionid = intval($optionid);
+			$merchid = $_W['merchid'];
+			$condition = ' and uniacid=:uniacid ';
+			if (0 < $merchid) 
+			{
+				$condition .= ' and merchid = ' . $merchid . ' ';
+			}
 			if (empty($id)) 
 			{
 				return;
 			}
-			$goods = pdo_fetch('select * from ' . tablename('ewei_shop_creditshop_goods') . ' where id=:id and uniacid=:uniacid limit 1', array(':id' => $id, ':uniacid' => $_W['uniacid']));
+			$goods = pdo_fetch('select * from ' . tablename('ewei_shop_creditshop_goods') . ' where id=:id ' . $condition . ' limit 1', array(':id' => $id, ':uniacid' => $_W['uniacid']));
 			if (empty($goods)) 
+			{
+				return false;
+			}
+			if (!(empty($goods['status'])) && empty($goods['status'])) 
 			{
 				return array('canbuy' => false, 'buymsg' => '已下架');
 			}
@@ -180,15 +299,10 @@ if (!(class_exists('CreditshopModel')))
 			{
 				$goods['acttype'] = 3;
 			}
-			if ($goods['isendtime'] == 0) 
-			{
-				$goods['endtime_str'] = date('Y-m-d H:i', $goods['usetime']);
-			}
-			else 
+			if (intval($goods['isendtime']) == 1) 
 			{
 				$goods['endtime_str'] = date('Y-m-d H:i', $goods['endtime']);
 			}
-			$goods['endtime_str'] = date('Y-m-d H:i', $goods['endtime']);
 			$goods['timestart_str'] = date('Y-m-d H:i', $goods['timestart']);
 			$goods['timeend_str'] = date('Y-m-d H:i', $goods['timeend']);
 			$goods['timestate'] = '';
@@ -261,6 +375,7 @@ if (!(class_exists('CreditshopModel')))
 							}
 							array_push($firstprice, m('dispatch')->getDispatchPrice(1, $dispatch));
 							$ret = array('min' => round(min($firstprice), 2), 'max' => round(max($firstprice), 2));
+							$goods['areas'] = $ret;
 						}
 						else 
 						{
@@ -273,10 +388,9 @@ if (!(class_exists('CreditshopModel')))
 				{
 					$goods['dispatch'] = 0;
 				}
-				$goods['dispatch'] = floatval($goods['dispatch']);
 				if ($goods['canbuy']) 
 				{
-					if ((0 < $goods['totalday']) && ($goods['type'] == 1)) 
+					if (0 < $goods['totalday']) 
 					{
 						$logcount = pdo_fetchcolumn('select count(*)  from ' . tablename('ewei_shop_creditshop_log') . '  where goodsid=:goodsid and status>=2 and  date_format(from_UNIXTIME(`createtime`),\'%Y-%m-%d\') = date_format(now(),\'%Y-%m-%d\') and uniacid=:uniacid  ', array(':goodsid' => $id, ':uniacid' => $_W['uniacid']));
 						if ($goods['totalday'] <= $logcount) 
@@ -312,7 +426,7 @@ if (!(class_exists('CreditshopModel')))
 				}
 				if ($goods['canbuy']) 
 				{
-					if ((0 < $goods['usermaxbuy']) && ($goods['type'] == 1)) 
+					if (0 < $goods['usermaxbuy']) 
 					{
 						$logcount = pdo_fetchcolumn('select ifnull(sum(total),0)  from ' . tablename('ewei_shop_creditshop_log') . '  where goodsid=:goodsid and openid=:openid  and uniacid=:uniacid ', array(':goodsid' => $id, ':uniacid' => $_W['uniacid'], ':openid' => $member['openid']));
 						if ($goods['chance'] <= $logcount) 
@@ -568,7 +682,6 @@ if (!(class_exists('CreditshopModel')))
 								m('message')->sendCustomNotice($noticeopenid, $msg);
 							}
 						}
-						return;
 					}
 				}
 			}
@@ -601,9 +714,11 @@ if (!(class_exists('CreditshopModel')))
 				if (!(empty($tm['send']))) 
 				{
 					m('message')->sendTplNotice($log['verifyopenid'], $tm['send'], $msg_saler, $detailurl1);
-					return;
 				}
-				m('message')->sendCustomNotice($log['verifyopenid'], $msg_saler, $detailurl1);
+				else 
+				{
+					m('message')->sendCustomNotice($log['verifyopenid'], $msg_saler, $detailurl1);
+				}
 			}
 		}
 		public function createQrcode($logid = 0) 
@@ -638,6 +753,16 @@ if (!(class_exists('CreditshopModel')))
 			{
 				$openid = $_W['openid'];
 			}
+			$merch_plugin = p('merch');
+			$merch_data = m('common')->getPluginset('merch');
+			if ($merch_plugin && $merch_data['is_openmerch']) 
+			{
+				$is_openmerch = 1;
+			}
+			else 
+			{
+				$is_openmerch = 0;
+			}
 			$uniacid = $_W['uniacid'];
 			$store = false;
 			$lastverifys = 0;
@@ -646,13 +771,21 @@ if (!(class_exists('CreditshopModel')))
 			{
 				$times = 1;
 			}
-			$saler = pdo_fetch('select * from ' . tablename('ewei_shop_saler') . ' where openid=:openid and uniacid=:uniacid limit 1', array(':uniacid' => $_W['uniacid'], ':openid' => $openid));
+			$log = pdo_fetch('select * from ' . tablename('ewei_shop_creditshop_log') . ' where id=:id and uniacid=:uniacid  limit 1', array(':id' => $logid, ':uniacid' => $uniacid));
+			$goods = pdo_fetch('select * from ' . tablename('ewei_shop_creditshop_goods') . ' where uniacid=:uniacid and id = :goodsid ', array(':uniacid' => $uniacid, ':goodsid' => $log['goodsid']));
+			$merchid = intval($goods['merchid']);
+			if (empty($merchid)) 
+			{
+				$saler = pdo_fetch('select * from ' . tablename('ewei_shop_saler') . ' where openid=:openid and uniacid=:uniacid limit 1', array(':uniacid' => $_W['uniacid'], ':openid' => $openid));
+			}
+			else if ($merch_plugin) 
+			{
+				$saler = pdo_fetch('select * from ' . tablename('ewei_shop_merch_saler') . ' where openid=:openid and uniacid=:uniacid and merchid=:merchid limit 1', array(':uniacid' => $_W['uniacid'], ':openid' => $openid, ':merchid' => $merchid));
+			}
 			if (empty($saler)) 
 			{
 				return error(-1, '无操作权限!');
 			}
-			$log = pdo_fetch('select * from ' . tablename('ewei_shop_creditshop_log') . ' where id=:id and uniacid=:uniacid  limit 1', array(':id' => $logid, ':uniacid' => $uniacid));
-			$goods = pdo_fetch('select * from ' . tablename('ewei_shop_creditshop_goods') . ' where uniacid=:uniacid and id = :goodsid ', array(':uniacid' => $uniacid, ':goodsid' => $log['goodsid']));
 			if (empty($log)) 
 			{
 				return error(-1, '该记录不存在!');
@@ -714,7 +847,14 @@ if (!(class_exists('CreditshopModel')))
 			}
 			if (!(empty($saler['storeid']))) 
 			{
-				$store = pdo_fetch('select * from ' . tablename('ewei_shop_store') . ' where id=:id and uniacid=:uniacid limit 1', array(':id' => $saler['storeid'], ':uniacid' => $_W['uniacid']));
+				if (0 < $merchid) 
+				{
+					$stores = pdo_fetch('select * from ' . tablename('ewei_shop_merch_store') . ' where id=:id and uniacid=:uniacid and merchid=:merchid and status=1 and type in(2,3)', array(':id' => $saler['storeid'], ':uniacid' => $_W['uniacid'], ':merchid' => $merchid));
+				}
+				else 
+				{
+					$stores = pdo_fetch('select * from ' . tablename('ewei_shop_store') . ' where id=:id and uniacid=:uniacid and status=1 and type in(2,3)', array(':id' => $saler['storeid'], ':uniacid' => $_W['uniacid']));
+				}
 			}
 			$carrier = unserialize($log['carrier']);
 			return array('log' => $log, 'store' => $store, 'saler' => $saler, 'lastverifys' => $lastverifys, 'goods' => $goods, 'verifyinfo' => $verifyinfo, 'carrier' => $carrier);
@@ -729,15 +869,33 @@ if (!(class_exists('CreditshopModel')))
 			{
 				$openid = $_W['openid'];
 			}
+			$merch_plugin = p('merch');
+			$merch_data = m('common')->getPluginset('merch');
+			if ($merch_plugin && $merch_data['is_openmerch']) 
+			{
+				$is_openmerch = 1;
+			}
+			else 
+			{
+				$is_openmerch = 0;
+			}
 			$data = $this->allow($logid, $times, $openid);
 			if (is_error($data)) 
 			{
 				return;
 			}
 			extract($data);
-			$saler = pdo_fetch('select * from ' . tablename('ewei_shop_saler') . ' where openid=:openid and uniacid=:uniacid limit 1', array(':uniacid' => $_W['uniacid'], ':openid' => $openid));
 			$log = pdo_fetch('select * from ' . tablename('ewei_shop_creditshop_log') . ' where id=:id and uniacid=:uniacid  limit 1', array(':id' => $logid, ':uniacid' => $uniacid));
 			$goods = pdo_fetch('select * from ' . tablename('ewei_shop_creditshop_goods') . ' where uniacid=:uniacid and id = :goodsid ', array(':uniacid' => $uniacid, ':goodsid' => $log['goodsid']));
+			$merchid = intval($goods['merchid']);
+			if (empty($merchid)) 
+			{
+				$saler = pdo_fetch('select * from ' . tablename('ewei_shop_saler') . ' where openid=:openid and uniacid=:uniacid limit 1', array(':uniacid' => $_W['uniacid'], ':openid' => $openid));
+			}
+			else if ($merch_plugin) 
+			{
+				$saler = pdo_fetch('select * from ' . tablename('ewei_shop_merch_saler') . ' where openid=:openid and uniacid=:uniacid and merchid=:merchid limit 1', array(':uniacid' => $_W['uniacid'], ':openid' => $openid, ':merchid' => $merchid));
+			}
 			if ($goods['isverify']) 
 			{
 				if ($goods['verifytype'] == 0) 
