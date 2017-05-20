@@ -1,5 +1,5 @@
 <?php
-//weichengtech
+
 if (!defined('IN_IA')) {
 	exit('Access Denied');
 }
@@ -11,5 +11,6 @@ class Task_EweiShopV2Page extends WebPage
 		$this->runTasks();
 	}
 }
+
 
 ?>

@@ -1,17 +1,15 @@
 <?php
-//weichengtech
-if (!defined('IN_IA')) {
+if (!defined('IN_IA')) 
+{
 	exit('Access Denied');
 }
-
-class PluginMobileLoginPage extends PluginMobilePage
+class PluginMobileLoginPage extends PluginMobilePage 
 {
-	public function __construct()
+	public function __construct() 
 	{
 		global $_W;
 		global $_GPC;
 		parent::__construct();
 	}
 }
-
 ?>

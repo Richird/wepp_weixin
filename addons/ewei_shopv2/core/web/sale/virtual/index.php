@@ -1,5 +1,5 @@
 <?php
-//weichengtech
+
 if (!defined('IN_IA')) {
 	exit('Access Denied');
 }
@@ -20,6 +20,7 @@ class Index_EweiShopV2Page extends WebPage
 			show_json(1);
 		}
 
+
 		$sale = m('common')->getSysset('sale');
 		$data = $sale['virtual'];
 		$module_ban = $_W['setting']['module_receive_ban'];
@@ -28,8 +29,10 @@ class Index_EweiShopV2Page extends WebPage
 			$module_ban = array();
 		}
 
+
 		include $this->template();
 	}
 }
+
 
 ?>

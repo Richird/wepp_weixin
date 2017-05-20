@@ -1,18 +1,18 @@
 <?php
-//weichengtech
-class Ui_EweiShopV2Model
+if (!defined('IN_IA')) 
 {
-	public function lazy($html = '')
+	exit('Access Denied');
+}
+class Ui_EweiShopV2Model 
+{
+	public function lazy($html = '') 
 	{
-		$html = preg_replace_callback('/<img.*?src=[\\\\\'| \\"](.*?(?:[\\.gif|\\.jpg|\\.png|\\.jpeg]?))[\\\\\'|\\"].*?[\\/]?>/', function($matches) {
+		$html = preg_replace_callback('/<img.*?src=[\\\\\'| \\"](.*?(?:[\\.gif|\\.jpg|\\.png|\\.jpeg]?))[\\\\\'|\\"].*?[\\/]?>/', function($matches) 
+		{
 			return preg_replace('/src\\=/', 'data-lazy=', $matches[0]);
-		}, $html);
+		}
+		, $html);
 		return $html;
 	}
 }
-
-if (!defined('IN_IA')) {
-	exit('Access Denied');
-}
-
 ?>

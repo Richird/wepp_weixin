@@ -1,30 +1,28 @@
 <?php
-//weichengtech
-if (!defined('IN_IA')) {
+if (!(defined('IN_IA'))) 
+{
 	exit('Access Denied');
 }
-
-class Index_EweiShopV2Page extends WebPage
+class Index_EweiShopV2Page extends WebPage 
 {
-	public function main()
+	public function main() 
 	{
-		if (cv('finance.recharge.view')) {
+		if (cv('finance.recharge.view')) 
+		{
 			header('location: ' . webUrl('finance/log/recharge'));
-			return NULL;
+			return;
 		}
-
-		if (cv('finance.withdraw.view')) {
+		if (cv('finance.withdraw.view')) 
+		{
 			header('location: ' . webUrl('finance/log/withdraw'));
-			return NULL;
+			return;
 		}
-
-		if (cv('finance.downloadbill')) {
+		if (cv('finance.downloadbill')) 
+		{
 			header('location: ' . webUrl('finance/downloadbill'));
-			return NULL;
+			return;
 		}
-
 		header('location: ' . webUrl());
 	}
 }
-
 ?>

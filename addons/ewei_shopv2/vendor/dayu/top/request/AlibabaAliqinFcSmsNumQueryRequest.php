@@ -1,5 +1,5 @@
 <?php
-//weichengtech
+
 class AlibabaAliqinFcSmsNumQueryRequest
 {
 	/** 

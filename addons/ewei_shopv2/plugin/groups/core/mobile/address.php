@@ -1,5 +1,5 @@
 <?php
-//weichengtech
+
 if (!defined('IN_IA')) {
 	exit('Access Denied');
 }
@@ -35,7 +35,9 @@ class Address_EweiShopV2Page extends PluginMobileLoginPage
 			if (method_exists($account, 'getShareAddressConfig')) {
 				$shareaddress_config = $account->getShareAddressConfig();
 			}
+
 		}
+
 
 		include $this->template();
 	}
@@ -50,6 +52,7 @@ class Address_EweiShopV2Page extends PluginMobileLoginPage
 		if (empty($data)) {
 			show_json(0, '地址未找到');
 		}
+
 
 		pdo_update('ewei_shop_member_address', array('isdefault' => 0), array('uniacid' => $_W['uniacid'], 'openid' => $_W['openid']));
 		pdo_update('ewei_shop_member_address', array('isdefault' => 1), array('id' => $id, 'uniacid' => $_W['uniacid'], 'openid' => $_W['openid']));
@@ -77,10 +80,11 @@ class Address_EweiShopV2Page extends PluginMobileLoginPage
 				$data['isdefault'] = 1;
 			}
 
+
 			pdo_insert('ewei_shop_member_address', $data);
 			$id = pdo_insertid();
 		}
-		else {
+		 else {
 			pdo_update('ewei_shop_member_address', $data, array('id' => $id, 'uniacid' => $_W['uniacid'], 'openid' => $_W['openid']));
 		}
 
@@ -98,6 +102,7 @@ class Address_EweiShopV2Page extends PluginMobileLoginPage
 			show_json(0, '地址未找到');
 		}
 
+
 		pdo_update('ewei_shop_member_address', array('deleted' => 1), array('id' => $id));
 
 		if ($data['isdefault'] == 1) {
@@ -108,7 +113,9 @@ class Address_EweiShopV2Page extends PluginMobileLoginPage
 				pdo_update('ewei_shop_member_address', array('isdefault' => 1), array('uniacid' => $_W['uniacid'], 'openid' => $_W['openid'], 'id' => $data2['id']));
 				show_json(1, array('defaultid' => $data2['id']));
 			}
+
 		}
+
 
 		show_json(1);
 	}
@@ -125,5 +132,6 @@ class Address_EweiShopV2Page extends PluginMobileLoginPage
 		exit();
 	}
 }
+
 
 ?>

@@ -38,7 +38,7 @@
         return;
     }
 ?>
-<div class="diymenu" style="{if !is_mobile()} position: absolute;max-width: 750px;{else}position: fixed;{/if}">
+<div class="diymenu" style="{if !is_weixin()}position: absolute; max-width: 750px;{else}position: fixed;{/if}">
     {loop $diymenu['data'] $item}
         <div class="item item-col-{php echo count($diymenu['data'])} {if count($item['child'])==0 && $diymenu['params']['navstyle']==0}{php echo menuon($item['linkurl'])}{/if}" {if count($item['child'])>0 && $diymenu['params']['navstyle']==0}onclick="showSubMenu(this)"{else}onclick="location.href = '{$item['linkurl']}'"{/if} {if strstr($item['linkurl'], 'r=member.cart')}id="menucart"{/if}>
             <div class="inner {if $diymenu['params']['navstyle']==1}image{/if}">

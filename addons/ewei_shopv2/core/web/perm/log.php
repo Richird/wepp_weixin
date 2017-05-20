@@ -1,5 +1,5 @@
 <?php
-//weichengtech
+
 if (!defined('IN_IA')) {
 	exit('Access Denied');
 }
@@ -21,15 +21,18 @@ class Log_EweiShopV2Page extends WebPage
 			$params[':keyword'] = '%' . $_GPC['keyword'] . '%';
 		}
 
+
 		if (!empty($_GPC['logtype'])) {
 			$condition .= ' and log.type=:logtype';
 			$params[':logtype'] = trim($_GPC['logtype']);
 		}
 
+
 		if (empty($starttime) || empty($endtime)) {
 			$starttime = strtotime('-1 month');
 			$endtime = time();
 		}
+
 
 		if (!empty($_GPC['searchtime'])) {
 			$starttime = strtotime($_GPC['time']['start']);
@@ -40,7 +43,9 @@ class Log_EweiShopV2Page extends WebPage
 				$params[':starttime'] = $starttime;
 				$params[':endtime'] = $endtime;
 			}
+
 		}
+
 
 		$list = pdo_fetchall('SELECT  log.* ,u.username FROM ' . tablename('ewei_shop_perm_log') . ' log  ' . ' left join ' . tablename('users') . ' u on log.uid = u.uid  ' . ' WHERE 1 ' . $condition . ' ORDER BY id desc LIMIT ' . (($pindex - 1) * $psize) . ',' . $psize, $params);
 		$total = pdo_fetchcolumn('SELECT count(*) FROM ' . tablename('ewei_shop_perm_log') . ' log  ' . ' left join ' . tablename('users') . ' u on log.uid = u.uid  ' . ' WHERE 1 ' . $condition . ' ', $params);
@@ -49,5 +54,6 @@ class Log_EweiShopV2Page extends WebPage
 		include $this->template();
 	}
 }
+
 
 ?>

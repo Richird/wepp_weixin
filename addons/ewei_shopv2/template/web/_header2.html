@@ -40,7 +40,7 @@
                 <li><a href="{php echo webUrl('sysset/account')}"><i class="icon icon-similar"></i>  切换公众号</a></li>
                 {if $_W['role'] == 'manager' || $_W['role'] == 'founder'}
                 <li><a href="./index.php?c=account&a=post&uniacid={$GLOBALS['_W']['uniacid']}" target="_blank"><i class="icon icon-wechat"></i>  编辑公众号</a></li>
-                <li><a href="./index.php?c=profile&a=payment&" target="_blank"><i class="icon icon-pay"></i>  支付参数</a></li>
+                <li><a href="{php echo webUrl('sysset/payset')}"><i class="icon icon-pay"></i>  支付方式</a></li>
                 {/if}
                 <li><a href="./index.php?c=utility&a=emulator&" target="_blank"><i class="icon icon-machinery"></i>  模拟测试</a></li>
 		{ifp 'perm'}
@@ -87,4 +87,3 @@
     <div class="page-content">
 {/if}
         
-

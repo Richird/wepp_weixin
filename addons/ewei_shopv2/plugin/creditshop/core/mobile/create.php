@@ -12,6 +12,17 @@ class Create_EweiShopV2Page extends PluginMobileLoginPage
 		$openid = $_W['openid'];
 		$uniacid = $_W['uniacid'];
 		$id = intval($_GPC['id']);
+		$merch_plugin = p('merch');
+		$merch_data = m('common')->getPluginset('merch');
+		if ($merch_plugin && $merch_data['is_openmerch']) 
+		{
+			$is_openmerch = 1;
+		}
+		else 
+		{
+			$is_openmerch = 0;
+		}
+		$merchid = intval($_GPC['merchid']);
 		$optionid = intval($_GPC['optionid']);
 		$shop = m('common')->getSysset('shop');
 		$member = m('member')->getMember($openid);
@@ -21,6 +32,9 @@ class Create_EweiShopV2Page extends PluginMobileLoginPage
 			$this->message('商品已下架或被删除!', mobileUrl('creditshop'), 'error');
 		}
 		$pay = m('common')->getSysset('pay');
+		$pay['weixin'] = ((!(empty($pay['weixin_sub'])) ? 1 : $pay['weixin']));
+		$pay['weixin_jie'] = ((!(empty($pay['weixin_jie_sub'])) ? 1 : $pay['weixin_jie']));
+		$goods['jie'] = intval($pay['weixin_jie']);
 		$set = m('common')->getPluginset('creditshop');
 		$goods['followed'] = m('user')->followed($openid);
 		if ($goods['goodstype'] == 0) 
@@ -35,11 +49,22 @@ class Create_EweiShopV2Page extends PluginMobileLoginPage
 				}
 				if (empty($storeids)) 
 				{
-					$stores = pdo_fetchall('select * from ' . tablename('ewei_shop_store') . ' where  uniacid=:uniacid and status=1', array(':uniacid' => $_W['uniacid']));
+					if (0 < $merchid) 
+					{
+						$stores = pdo_fetchall('select * from ' . tablename('ewei_shop_merch_store') . ' where  uniacid=:uniacid and merchid=:merchid and status=1 and type in(2,3)', array(':uniacid' => $_W['uniacid'], ':merchid' => $merchid));
+					}
+					else 
+					{
+						$stores = pdo_fetchall('select * from ' . tablename('ewei_shop_store') . ' where  uniacid=:uniacid and status=1 and type in(2,3)', array(':uniacid' => $_W['uniacid']));
+					}
+				}
+				else if (0 < $merchid) 
+				{
+					$stores = pdo_fetchall('select * from ' . tablename('ewei_shop_merch_store') . ' where id in (' . implode(',', $storeids) . ') and uniacid=:uniacid and merchid=:merchid and status=1 and type in(2,3)', array(':uniacid' => $_W['uniacid'], ':merchid' => $merchid));
 				}
 				else 
 				{
-					$stores = pdo_fetchall('select * from ' . tablename('ewei_shop_store') . ' where id in (' . implode(',', $storeids) . ') and uniacid=:uniacid and status=1', array(':uniacid' => $_W['uniacid']));
+					$stores = pdo_fetchall('select * from ' . tablename('ewei_shop_store') . ' where id in (' . implode(',', $storeids) . ') and uniacid=:uniacid and status=1 and type in(2,3)', array(':uniacid' => $_W['uniacid']));
 				}
 			}
 		}
@@ -138,11 +163,11 @@ class Create_EweiShopV2Page extends PluginMobileLoginPage
 					$areas = unserialize($dispatch_data['areas']);
 					if (!(empty($address))) 
 					{
-						$dprice = m('dispatch')->getCityDispatchPrice($areas, $address['city'], $param, $dispatch_data);
+						$dprice = m('dispatch')->getCityDispatchPrice($areas, $address, $param, $dispatch_data);
 					}
 					else if (!(empty($member['city']))) 
 					{
-						$dprice = m('dispatch')->getCityDispatchPrice($areas, $member['city'], $param, $dispatch_data);
+						$dprice = m('dispatch')->getCityDispatchPrice($areas, $member, $param, $dispatch_data);
 					}
 					else 
 					{
