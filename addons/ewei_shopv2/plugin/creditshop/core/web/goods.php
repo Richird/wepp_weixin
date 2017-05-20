@@ -1,6 +1,5 @@
 <?php
-//weichengtech
-if (!defined('IN_IA')) {
+if (!(defined('IN_IA'))) {
 	exit('Access Denied');
 }
 
@@ -15,41 +14,42 @@ class Goods_EweiShopV2Page extends PluginWebPage
 		if ($merch_plugin && $merch_data['is_openmerch']) {
 			$is_openmerch = 1;
 		}
-		else {
+		 else {
 			$is_openmerch = 0;
 		}
 
 		$pindex = max(1, intval($_GPC['page']));
 		$psize = 15;
 		$condition = ' uniacid = :uniacid ';
-		$tab = (!empty($_GPC['tab']) ? trim($_GPC['tab']) : 'sell');
+		$tab = ((!(empty($_GPC['tab'])) ? trim($_GPC['tab']) : 'sell'));
 		if (empty($tab) || ($tab == 'sell')) {
 			$condition .= ' and status = 1 and total > 0 and deleted = 0 ';
 		}
-		else if ($tab == 'sellout') {
+		 else if ($tab == 'sellout') {
 			$condition .= ' and status = 1 and total = 0 and deleted = 0 ';
 		}
-		else if ($tab == 'warehouse') {
+		 else if ($tab == 'warehouse') {
 			$condition .= ' and status = 0 and deleted = 0 ';
 		}
-		else {
-			if ($tab == 'recycle') {
-				$condition .= ' and deleted = 1 ';
-			}
+		 else if ($tab == 'recycle') {
+			$condition .= ' and deleted = 1 ';
 		}
+
 
 		$params = array(':uniacid' => $_W['uniacid']);
 
-		if (!empty($_GPC['keyword'])) {
+		if (!(empty($_GPC['keyword']))) {
 			$_GPC['keyword'] = trim($_GPC['keyword']);
 			$condition .= ' AND title LIKE :title';
 			$params[':title'] = '%' . trim($_GPC['keyword']) . '%';
 		}
 
+
 		if ($_GPC['cate'] != '') {
 			$condition .= ' AND cate = :cate';
 			$params[':cate'] = intval($_GPC['cate']);
 		}
+
 
 		$sql = 'SELECT * FROM ' . tablename('ewei_shop_creditshop_goods') . ' where  1 and ' . $condition . ' ORDER BY displayorder DESC LIMIT ' . (($pindex - 1) * $psize) . ',' . $psize;
 		$list = pdo_fetchall($sql, $params);
@@ -57,12 +57,14 @@ class Goods_EweiShopV2Page extends PluginWebPage
 
 		if ($merch_plugin) {
 			$merch_user = $merch_plugin->getListUser($list, 'merch_user');
-			if (!empty($list) && !empty($merch_user)) {
-				foreach ($list as &$row) {
-					$row['merchname'] = $merch_user[$row['merchid']]['merchname'] ? $merch_user[$row['merchid']]['merchname'] : $_W['shopset']['shop']['name'];
+			if (!(empty($list)) && !(empty($merch_user))) {
+				foreach ($list as &$row ) {
+					$row['merchname'] = (($merch_user[$row['merchid']]['merchname'] ? $merch_user[$row['merchid']]['merchname'] : $_W['shopset']['shop']['name']));
 				}
 			}
+
 		}
+
 
 		$pager = pagination($total, $pindex, $psize);
 		$category = pdo_fetchall('select id,name,thumb from ' . tablename('ewei_shop_creditshop_category') . ' where uniacid=:uniacid order by displayorder desc', array(':uniacid' => $_W['uniacid']), 'id');
@@ -87,65 +89,71 @@ class Goods_EweiShopV2Page extends PluginWebPage
 		$item = pdo_fetch('SELECT * FROM ' . tablename('ewei_shop_creditshop_goods') . ' WHERE id =:id and uniacid=:uniacid limit 1', array(':uniacid' => $_W['uniacid'], ':id' => $id));
 		$merchid = intval($_W['merchid']);
 
-		if (!empty($item)) {
+		if (!(empty($item))) {
 			$url = mobileUrl('creditshop/detail', array('id' => $item['id']), true);
 			$qrcode = m('qrcode')->createQrcode($url);
 		}
+
 
 		if ($item['showlevels'] != '') {
 			$item['showlevels'] = explode(',', $item['showlevels']);
 		}
 
+
 		if ($item['buylevels'] != '') {
 			$item['buylevels'] = explode(',', $item['buylevels']);
 		}
+
 
 		if ($item['showgroups'] != '') {
 			$item['showgroups'] = explode(',', $item['showgroups']);
 		}
 
+
 		if ($item['buygroups'] != '') {
 			$item['buygroups'] = explode(',', $item['buygroups']);
 		}
 
+
 		$stores = array();
 
-		if (!empty($item['storeids'])) {
+		if (!(empty($item['storeids']))) {
 			$stores = pdo_fetchall('select id,storename from ' . tablename('ewei_shop_store') . ' where id in (' . $item['storeids'] . ' ) and uniacid=' . $_W['uniacid']);
 		}
 
-		if (!empty($item['noticeopenid'])) {
+
+		if (!(empty($item['noticeopenid']))) {
 			$saler = m('member')->getMember($item['noticeopenid']);
 		}
 
-		$endtime = (empty($item['endtime']) ? date('Y-m-d H:i', time()) : date('Y-m-d H:i', $item['endtime']));
+
+		$endtime = ((empty($item['endtime']) ? date('Y-m-d H:i', time()) : date('Y-m-d H:i', $item['endtime'])));
 		$groups = m('member')->getGroups();
 		$category = pdo_fetchall('select id,name,thumb from ' . tablename('ewei_shop_creditshop_category') . ' where uniacid=:uniacid order by displayorder desc', array(':uniacid' => $_W['uniacid']));
 		if (empty($item['goodstype']) || ($item['goodstype'] == 0)) {
 			$goods = pdo_fetch('SELECT * FROM ' . tablename('ewei_shop_goods') . ' WHERE id =:id and status=1 and deleted=0 and uniacid=:uniacid limit 1', array(':uniacid' => $_W['uniacid'], ':id' => $item['goodsid']));
 		}
-		else {
-			if ($item['goodstype'] == 1) {
-				$coupon = pdo_fetch('SELECT * FROM ' . tablename('ewei_shop_coupon') . ' WHERE id =:id and uniacid=:uniacid limit 1', array(':uniacid' => $_W['uniacid'], ':id' => $item['couponid']));
-			}
+		 else if ($item['goodstype'] == 1) {
+			$coupon = pdo_fetch('SELECT * FROM ' . tablename('ewei_shop_coupon') . ' WHERE id =:id and uniacid=:uniacid limit 1', array(':uniacid' => $_W['uniacid'], ':id' => $item['couponid']));
 		}
+
 
 		$goodstype = $item['goodstype'];
 		$type = $item['type'];
 		$isverify = $item['isverify'];
 		$levels = m('member')->getLevels();
 
-		foreach ($levels as &$l) {
+		foreach ($levels as &$l ) {
 			$l['key'] = 'level' . $l['id'];
 		}
 
 		unset($l);
 		$levels = array_merge(array(
-	array('id' => 0, 'key' => 'default', 'levelname' => empty($_W['shopset']['shop']['levelname']) ? '默认会员' : $_W['shopset']['shop']['levelname'])
+	array('id' => 0, 'key' => 'default', 'levelname' => (empty($_W['shopset']['shop']['levelname']) ? '默认会员' : $_W['shopset']['shop']['levelname']))
 	), $levels);
 		$allspecs = pdo_fetchall('select * from ' . tablename('ewei_shop_creditshop_spec') . ' where goodsid=:id order by displayorder asc', array(':id' => $id));
 
-		foreach ($allspecs as &$s) {
+		foreach ($allspecs as &$s ) {
 			$s['items'] = pdo_fetchall('select a.id,a.specid,a.title,a.thumb,a.show,a.displayorder,a.valueId,a.virtual,b.title as title2 from ' . tablename('ewei_shop_creditshop_spec_item') . ' a left join ' . tablename('ewei_shop_virtual_type') . ' b on b.id=a.virtual  where a.specid=:specid order by a.displayorder asc', array(':specid' => $s['id']));
 		}
 
@@ -160,15 +168,16 @@ class Goods_EweiShopV2Page extends PluginWebPage
 		if (0 < count($options)) {
 			$specitemids = explode('_', $options[0]['specs']);
 
-			foreach ($specitemids as $itemid) {
-				foreach ($allspecs as $ss) {
+			foreach ($specitemids as $itemid ) {
+				foreach ($allspecs as $ss ) {
 					$items = $ss['items'];
 
-					foreach ($items as $it) {
+					foreach ($items as $it ) {
 						if ($it['id'] == $itemid) {
 							$specs[] = $ss;
 							break;
 						}
+
 					}
 				}
 			}
@@ -203,6 +212,7 @@ class Goods_EweiShopV2Page extends PluginWebPage
 					$itemlen = 1;
 				}
 
+
 				$newlen *= $itemlen;
 				$h = array();
 				$j = 0;
@@ -228,13 +238,13 @@ class Goods_EweiShopV2Page extends PluginWebPage
 
 			if ($canedit) {
 				$html .= '<th><div class=""><div style="padding-bottom:10px;text-align:center;">库存</div><div class="input-group"><input type="text" class="form-control input-sm option_total_all"  VALUE=""/><span class="input-group-addon" ><a href="javascript:;" class="fa fa-angle-double-down" title="批量设置" onclick="setCol(\'option_total\');"></a></span></div></div></th>';
-				$html .= "<th><div class=\"\"><div style=\"padding-bottom:10px;text-align:center;\">积分</div>\n<div class=\"input-group\"><input type=\"text\" class=\"form-control  input-sm option_credit_all\"  VALUE=\"\"/><span class=\"input-group-addon\">\n<a href=\"javascript:;\" class=\"fa fa-angle-double-down\" title=\"批量设置\" onclick=\"setCol('option_credit');\"></a></span></div></div></th>";
-				$html .= "<th><div class=\"\"><div style=\"padding-bottom:10px;text-align:center;\">金额</div>\n<div class=\"input-group\"><input type=\"text\" class=\"form-control input-sm option_money_all\"  VALUE=\"\"/><span class=\"input-group-addon\">\n<a href=\"javascript:;\" class=\"fa fa-angle-double-down\" title=\"批量设置\" onclick=\"setCol('option_money');\"></a></span></div></div></th>";
+				$html .= '<th><div class=""><div style="padding-bottom:10px;text-align:center;">积分</div>' . "\n" . '<div class="input-group"><input type="text" class="form-control  input-sm option_credit_all"  VALUE=""/><span class="input-group-addon">' . "\n" . '<a href="javascript:;" class="fa fa-angle-double-down" title="批量设置" onclick="setCol(\'option_credit\');"></a></span></div></div></th>';
+				$html .= '<th><div class=""><div style="padding-bottom:10px;text-align:center;">金额</div>' . "\n" . '<div class="input-group"><input type="text" class="form-control input-sm option_money_all"  VALUE=""/><span class="input-group-addon">' . "\n" . '<a href="javascript:;" class="fa fa-angle-double-down" title="批量设置" onclick="setCol(\'option_money\');"></a></span></div></div></th>';
 				$html .= '<th><div class=""><div style="padding-bottom:10px;text-align:center;">编码</div><div class="input-group"><input type="text" class="form-control input-sm option_goodssn_all"  VALUE=""/><span class="input-group-addon"><a href="javascript:;" class="fa fa-angle-double-down" title="批量设置" onclick="setCol(\'option_goodssn\');"></a></span></div></div></th>';
 				$html .= '<th><div class=""><div style="padding-bottom:10px;text-align:center;">条码</div><div class="input-group"><input type="text" class="form-control input-sm option_productsn_all"  VALUE=""/><span class="input-group-addon"><a href="javascript:;" class="fa fa-angle-double-down" title="批量设置" onclick="setCol(\'option_productsn\');"></a></span></div></div></th>';
 				$html .= '<th><div class=""><div style="padding-bottom:10px;text-align:center;">重量（克）</div><div class="input-group"><input type="text" class="form-control input-sm option_weight_all"  VALUE=""/><span class="input-group-addon"><a href="javascript:;" class="fa fa-angle-double-down" title="批量设置" onclick="setCol(\'option_weight\');"></a></span></div></div></th>';
 			}
-			else {
+			 else {
 				$html .= '<th><div class=""><div style="padding-bottom:10px;text-align:center;">库存</div></div></th>';
 				$html .= '<th"><div class=""><div style="padding-bottom:10px;text-align:center;">积分</div></div></th>';
 				$html .= '<th><div class=""><div style="padding-bottom:10px;text-align:center;">金额</div></div></th>';
@@ -261,7 +271,7 @@ class Goods_EweiShopV2Page extends PluginWebPage
 					if (($j % $rowspan) == 0) {
 						$h[$m][$j] = array('html' => '<td class=\'full\' rowspan=\'' . $rowspan . '\'>' . $specs[$m]['items'][$kid]['title'] . '</td>', 'id' => $specs[$m]['items'][$kid]['id']);
 					}
-					else {
+					 else {
 						$h[$m][$j] = array('html' => '', 'id' => $specs[$m]['items'][$kid]['id']);
 					}
 
@@ -274,8 +284,10 @@ class Goods_EweiShopV2Page extends PluginWebPage
 							$kid = 0;
 						}
 
+
 						$n = 0;
 					}
+
 
 					++$j;
 				}
@@ -309,16 +321,17 @@ class Goods_EweiShopV2Page extends PluginWebPage
 				$ids = implode('_', $ids);
 				$val = array('id' => '', 'title' => '', 'total' => '', 'credit' => '', 'money' => '', 'weight' => '', 'virtual' => '');
 
-				foreach ($options as $o) {
+				foreach ($options as $o ) {
 					if ($ids === $o['specs']) {
 						$val = array('id' => $o['id'], 'title' => $o['title'], 'total' => $o['total'], 'credit' => $o['credit'], 'money' => $o['money'], 'goodssn' => $o['goodssn'], 'productsn' => $o['productsn'], 'weight' => $o['weight'], 'virtual' => $o['virtual']);
 						$discount_val = array('id' => $o['id']);
 						break;
 					}
+
 				}
 
 				if ($canedit) {
-					foreach ($levels as $level) {
+					foreach ($levels as $level ) {
 						$dd .= '<td>';
 						$isdd .= '<td>';
 
@@ -326,7 +339,7 @@ class Goods_EweiShopV2Page extends PluginWebPage
 							$dd .= '<input data-name="discount_level_' . $level['key'] . '_' . $ids . '"  type="text" class="form-control discount_' . $level['key'] . ' discount_' . $level['key'] . '_' . $ids . '" value="' . $discounts_val[$level['key']] . '"/> ';
 							$isdd .= '<input data-name="isdiscount_discounts_level_' . $level['key'] . '_' . $ids . '"  type="text" class="form-control isdiscount_discounts_' . $level['key'] . ' isdiscount_discounts_' . $level['key'] . '_' . $ids . '" value="' . $isdiscounts_val[$level['key']] . '"/> ';
 						}
-						else {
+						 else {
 							$dd .= '<input data-name="discount_level_' . $level['id'] . '_' . $ids . '"  type="text" class="form-control discount_level' . $level['id'] . ' discount_level' . $level['id'] . '_' . $ids . '" value="' . $discounts_val['level' . $level['id']] . '"/> ';
 							$isdd .= '<input data-name="isdiscount_discounts_level_' . $level['id'] . '_' . $ids . '"  type="text" class="form-control isdiscount_discounts_level' . $level['id'] . ' isdiscount_discounts_level' . $level['id'] . '_' . $ids . '" value="' . $isdiscounts_val['level' . $level['id']] . '"/> ';
 						}
@@ -364,7 +377,7 @@ class Goods_EweiShopV2Page extends PluginWebPage
 					$hh .= '<td><input data-name="option_weight_' . $ids . '" type="text" class="form-control option_weight option_weight_' . $ids . '" " value="' . $val['weight'] . '"/></td>';
 					$hh .= '</tr>';
 				}
-				else {
+				 else {
 					$hh .= '<td>' . $val['total'] . '</td>';
 					$hh .= '<td>' . $val['credit'] . '</td>';
 					$hh .= '<td>' . $val['money'] . '</td>';
@@ -387,10 +400,11 @@ class Goods_EweiShopV2Page extends PluginWebPage
 			$commission_html .= '</table>';
 		}
 
+
 		$dispatch_data = pdo_fetchall('select * from ' . tablename('ewei_shop_dispatch') . ' where uniacid=:uniacid and merchid=:merchid and enabled=1 order by displayorder desc', array(':uniacid' => $_W['uniacid'], ':merchid' => $merchid));
 
 		if ($_W['ispost']) {
-			$data = array('uniacid' => $_W['uniacid'], 'displayorder' => intval($_GPC['displayorder']), 'goodstype' => intval($_GPC['goodstype']), 'goodsid' => intval($_GPC['goodsid']), 'couponid' => intval($_GPC['couponid']), 'grant1' => floatval($_GPC['grant1']), 'grant2' => floatval($_GPC['grant2']), 'packetmoney' => floatval($_GPC['packetmoney']), 'packetlimit' => floatval($_GPC['packetlimit']), 'packettotal' => intval($_GPC['packettotal']), 'packettype' => intval($_GPC['packettype']), 'minpacketmoney' => floatval($_GPC['minpacketmoney']), 'title' => trim($_GPC['title']), 'cate' => intval($_GPC['cate']), 'thumb' => save_media($_GPC['thumb']), 'price' => floatval($_GPC['price']), 'productprice' => floatval($_GPC['productprice']), 'credit' => intval($_GPC['credit']), 'money' => trim($_GPC['money']), 'dispatchtype' => intval($_GPC['dispatchtype']), 'dispatchid' => intval($_GPC['dispatchid']), 'dispatch' => floatval($_GPC['dispatch']), 'istop' => intval($_GPC['istop']), 'isrecommand' => intval($_GPC['isrecommand']), 'istime' => intval($_GPC['istime']), 'timestart' => strtotime($_GPC['timestart']), 'timeend' => strtotime($_GPC['timeend']), 'goodsdetail' => m('common')->html_images($_GPC['goodsdetail']), 'goodssn' => trim($_GPC['goodssn']), 'productsn' => trim($_GPC['productsn']), 'weight' => intval($_GPC['weight']), 'total' => intval($_GPC['total']), 'showtotal' => intval($_GPC['showtotal']), 'totalcnf' => intval($_GPC['totalcnf']), 'hasoption' => intval($_GPC['hasoption']), 'status' => intval($_GPC['status']), 'type' => intval($_GPC['type']), 'area' => trim($_GPC['area']), 'chanceday' => intval($_GPC['chanceday']), 'chance' => intval($_GPC['chance']), 'totalday' => intval($_GPC['totalday']), 'rate1' => trim($_GPC['rate1']), 'rate2' => trim($_GPC['rate2']), 'isendtime' => intval($_GPC['isendtime']), 'usetime' => 0 <= intval($_GPC['usetime']) ? intval($_GPC['usetime']) : 0, 'endtime' => strtotime($_GPC['endtime']), 'detailshow' => intval($_GPC['detailshow']), 'noticedetailshow' => intval($_GPC['noticedetailshow']), 'detail' => m('common')->html_images($_GPC['detail']), 'noticedetail' => m('common')->html_images($_GPC['noticedetail']), 'showlevels' => is_array($_GPC['showlevels']) ? implode(',', $_GPC['showlevels']) : '', 'buylevels' => is_array($_GPC['buylevels']) ? implode(',', $_GPC['buylevels']) : '', 'showgroups' => is_array($_GPC['showgroups']) ? implode(',', $_GPC['showgroups']) : '', 'buygroups' => is_array($_GPC['buygroups']) ? implode(',', $_GPC['buygroups']) : '', 'subtitle' => trim($_GPC['subtitle']), 'subdetail' => m('common')->html_images($_GPC['subdetail']), 'isverify' => intval($_GPC['isverify']), 'verifytype' => intval($_GPC['verifytype']), 'verifynum' => intval($_GPC['verifynum']), 'storeids' => is_array($_GPC['storeids']) ? implode(',', $_GPC['storeids']) : '', 'noticeopenid' => trim($_GPC['noticeopenid']), 'followneed' => intval($_GPC['followneed']), 'followtext' => trim($_GPC['followtext']), 'share_title' => trim($_GPC['share_title']), 'share_icon' => save_media($_GPC['share_icon']), 'share_desc' => trim($_GPC['share_desc']));
+			$data = array('uniacid' => $_W['uniacid'], 'displayorder' => intval($_GPC['displayorder']), 'goodstype' => intval($_GPC['goodstype']), 'goodsid' => intval($_GPC['goodsid']), 'couponid' => intval($_GPC['couponid']), 'grant1' => floatval($_GPC['grant1']), 'grant2' => floatval($_GPC['grant2']), 'packetmoney' => floatval($_GPC['packetmoney']), 'packetlimit' => floatval($_GPC['packetlimit']), 'packettotal' => intval($_GPC['packettotal']), 'packettype' => intval($_GPC['packettype']), 'minpacketmoney' => floatval($_GPC['minpacketmoney']), 'title' => trim($_GPC['title']), 'cate' => intval($_GPC['cate']), 'thumb' => save_media($_GPC['thumb']), 'price' => floatval($_GPC['price']), 'productprice' => floatval($_GPC['productprice']), 'credit' => intval($_GPC['credit']), 'money' => trim($_GPC['money']), 'dispatchtype' => intval($_GPC['dispatchtype']), 'dispatchid' => intval($_GPC['dispatchid']), 'dispatch' => floatval($_GPC['dispatch']), 'istop' => intval($_GPC['istop']), 'isrecommand' => intval($_GPC['isrecommand']), 'istime' => intval($_GPC['istime']), 'timestart' => strtotime($_GPC['timestart']), 'timeend' => strtotime($_GPC['timeend']), 'goodsdetail' => m('common')->html_images($_GPC['goodsdetail']), 'goodssn' => trim($_GPC['goodssn']), 'productsn' => trim($_GPC['productsn']), 'weight' => intval($_GPC['weight']), 'total' => intval($_GPC['total']), 'showtotal' => intval($_GPC['showtotal']), 'totalcnf' => intval($_GPC['totalcnf']), 'hasoption' => intval($_GPC['hasoption']), 'status' => intval($_GPC['status']), 'type' => intval($_GPC['type']), 'area' => trim($_GPC['area']), 'chanceday' => intval($_GPC['chanceday']), 'chance' => intval($_GPC['chance']), 'totalday' => intval($_GPC['totalday']), 'rate1' => trim($_GPC['rate1']), 'rate2' => trim($_GPC['rate2']), 'isendtime' => intval($_GPC['isendtime']), 'usetime' => (0 <= intval($_GPC['usetime']) ? intval($_GPC['usetime']) : 0), 'endtime' => strtotime($_GPC['endtime']), 'detailshow' => intval($_GPC['detailshow']), 'noticedetailshow' => intval($_GPC['noticedetailshow']), 'detail' => m('common')->html_images($_GPC['detail']), 'noticedetail' => m('common')->html_images($_GPC['noticedetail']), 'showlevels' => (is_array($_GPC['showlevels']) ? implode(',', $_GPC['showlevels']) : ''), 'buylevels' => (is_array($_GPC['buylevels']) ? implode(',', $_GPC['buylevels']) : ''), 'showgroups' => (is_array($_GPC['showgroups']) ? implode(',', $_GPC['showgroups']) : ''), 'buygroups' => (is_array($_GPC['buygroups']) ? implode(',', $_GPC['buygroups']) : ''), 'subtitle' => trim($_GPC['subtitle']), 'subdetail' => m('common')->html_images($_GPC['subdetail']), 'isverify' => intval($_GPC['isverify']), 'verifytype' => intval($_GPC['verifytype']), 'verifynum' => intval($_GPC['verifynum']), 'storeids' => (is_array($_GPC['storeids']) ? implode(',', $_GPC['storeids']) : ''), 'noticeopenid' => trim($_GPC['noticeopenid']), 'followneed' => intval($_GPC['followneed']), 'followtext' => trim($_GPC['followtext']), 'share_title' => trim($_GPC['share_title']), 'share_icon' => save_media($_GPC['share_icon']), 'share_desc' => trim($_GPC['share_desc']));
 
 			if ($isverify) {
 				$data['dispatch'] = 0;
@@ -398,26 +412,32 @@ class Goods_EweiShopV2Page extends PluginWebPage
 					$data['verifynum'] = 1;
 				}
 
+
 				if ($data['verifytype'] == 0) {
 					$data['verifynum'] = 1;
 				}
+
 			}
+
 
 			if ($data['credit'] <= 0) {
 				show_json(0, '请正确填写积分！');
 			}
 
+
 			if ($data['money'] < 0) {
 				show_json(0, '请正确填写金额！');
 			}
+
 
 			if (($data['goodstype'] == 2) && ($data['grant1'] <= 0)) {
 				show_json(0, '请正确填写余额！');
 			}
 
-			$data['vip'] = !empty($data['showlevels']) || !empty($data['showgroups']) ? 1 : 0;
 
-			if (!empty($id)) {
+			$data['vip'] = ((!(empty($data['showlevels'])) || !(empty($data['showgroups'])) ? 1 : 0));
+
+			if (!(empty($id))) {
 				$data['goodstype'] = $goodstype;
 				$data['type'] = $type;
 				$data['isverify'] = $isverify;
@@ -431,27 +451,34 @@ class Goods_EweiShopV2Page extends PluginWebPage
 				pdo_update('ewei_shop_creditshop_goods', $data, array('id' => $id, 'uniacid' => $_W['uniacid']));
 				plog('creditshop.goods.edit', '编辑积分商城商品 ID: ' . $id . ' <br/>商品名称: ' . $data['title']);
 			}
-			else {
+			 else {
 				if (($data['goodstype'] == 3) || (0 < $data['packetmoney']) || (0 < $data['packettotal'])) {
 					if ($data['packettype'] == 0) {
 						if ($data['grant2'] < 1) {
 							show_json(0, '红包最少为1元，请正确填写！');
 						}
 
-						if ($data['packetmoney'] != ($data['grant2'] * $data['packettotal'])) {
+
+						if ($data['packetmoney'] != $data['grant2'] * $data['packettotal']) {
 							show_json(0, '请正确填写红包金额和数量！');
 						}
+
 					}
-					else {
+					 else {
 						if ($data['minpacketmoney'] < 1) {
 							show_json(0, '红包随机金额最少为1元，请正确填写！');
 						}
 
+
 						if ($data['packetmoney'] < ($data['minpacketmoney'] * $data['packettotal'])) {
 							show_json(0, '请正确填写红包金额和数量！');
 						}
+
+
 					}
+
 				}
+
 
 				$data['surplusmoney'] = $data['packetmoney'];
 				$data['packetsurplus'] = $data['packettotal'];
@@ -480,7 +507,7 @@ class Goods_EweiShopV2Page extends PluginWebPage
 						pdo_update('ewei_shop_creditshop_spec', $a, array('id' => $get_spec_id));
 						$spec_id = $get_spec_id;
 					}
-					else {
+					 else {
 						pdo_insert('ewei_shop_creditshop_spec', $a);
 						$spec_id = pdo_insertid();
 					}
@@ -498,14 +525,14 @@ class Goods_EweiShopV2Page extends PluginWebPage
 					while ($n < $itemlen) {
 						$item_id = '';
 						$get_item_id = $spec_item_ids[$n];
-						$d = array('uniacid' => $_W['uniacid'], 'specid' => $spec_id, 'displayorder' => $n, 'title' => $spec_item_titles[$n], 'show' => $spec_item_shows[$n], 'thumb' => save_media($spec_item_thumbs[$n]), 'virtual' => $data['type'] == 3 ? $spec_item_virtuals[$n] : 0);
+						$d = array('uniacid' => $_W['uniacid'], 'specid' => $spec_id, 'displayorder' => $n, 'title' => $spec_item_titles[$n], 'show' => $spec_item_shows[$n], 'thumb' => save_media($spec_item_thumbs[$n]), 'virtual' => ($data['type'] == 3 ? $spec_item_virtuals[$n] : 0));
 						$f = 'spec_item_thumb_' . $get_item_id;
 
 						if (is_numeric($get_item_id)) {
 							pdo_update('ewei_shop_creditshop_spec_item', $d, array('id' => $get_item_id));
 							$item_id = $get_item_id;
 						}
-						else {
+						 else {
 							pdo_insert('ewei_shop_creditshop_spec_item', $d);
 							$item_id = pdo_insertid();
 						}
@@ -520,7 +547,7 @@ class Goods_EweiShopV2Page extends PluginWebPage
 					if (0 < count($itemids)) {
 						pdo_query('delete from ' . tablename('ewei_shop_creditshop_spec_item') . ' where uniacid=' . $_W['uniacid'] . ' and specid=' . $spec_id . ' and id not in (' . implode(',', $itemids) . ')');
 					}
-					else {
+					 else {
 						pdo_query('delete from ' . tablename('ewei_shop_creditshop_spec_item') . ' where uniacid=' . $_W['uniacid'] . ' and specid=' . $spec_id);
 					}
 
@@ -532,7 +559,7 @@ class Goods_EweiShopV2Page extends PluginWebPage
 				if (0 < count($specids)) {
 					pdo_query('delete from ' . tablename('ewei_shop_creditshop_spec') . ' where uniacid=' . $_W['uniacid'] . ' and goodsid=' . $id . ' and id not in (' . implode(',', $specids) . ')');
 				}
-				else {
+				 else {
 					pdo_query('delete from ' . tablename('ewei_shop_creditshop_spec') . ' where uniacid=' . $_W['uniacid'] . ' and goodsid=' . $id);
 				}
 
@@ -550,24 +577,25 @@ class Goods_EweiShopV2Page extends PluginWebPage
 					$idsarr = explode('_', $ids);
 					$newids = array();
 
-					foreach ($idsarr as $key => $ida) {
-						foreach ($spec_items as $it) {
+					foreach ($idsarr as $key => $ida ) {
+						foreach ($spec_items as $it ) {
 							if ($it['get_id'] == $ida) {
 								$newids[] = $it['id'];
 								break;
 							}
+
 						}
 					}
 
 					$newids = implode('_', $newids);
-					$a = array('uniacid' => $_W['uniacid'], 'title' => $optionArray['option_title'][$k], 'credit' => $optionArray['option_credit'][$k], 'money' => $optionArray['option_money'][$k], 'total' => $optionArray['option_total'][$k], 'weight' => $optionArray['option_weight'][$k], 'goodssn' => $optionArray['option_goodssn'][$k], 'productsn' => $optionArray['option_productsn'][$k], 'goodsid' => $id, 'specs' => $newids, 'virtual' => $data['type'] == 3 ? $optionArray['option_virtual'][$k] : 0);
+					$a = array('uniacid' => $_W['uniacid'], 'title' => $optionArray['option_title'][$k], 'credit' => $optionArray['option_credit'][$k], 'money' => $optionArray['option_money'][$k], 'total' => $optionArray['option_total'][$k], 'weight' => $optionArray['option_weight'][$k], 'goodssn' => $optionArray['option_goodssn'][$k], 'productsn' => $optionArray['option_productsn'][$k], 'goodsid' => $id, 'specs' => $newids, 'virtual' => ($data['type'] == 3 ? $optionArray['option_virtual'][$k] : 0));
 					$totalstocks += $a['total'];
 
 					if (empty($get_option_id)) {
 						pdo_insert('ewei_shop_creditshop_option', $a);
 						$option_id = pdo_insertid();
 					}
-					else {
+					 else {
 						pdo_update('ewei_shop_creditshop_option', $a, array('id' => $get_option_id));
 						$option_id = $get_option_id;
 					}
@@ -578,10 +606,10 @@ class Goods_EweiShopV2Page extends PluginWebPage
 
 				if ((0 < count($optionids)) && ($data['hasoption'] !== 0)) {
 					pdo_query('delete from ' . tablename('ewei_shop_creditshop_option') . ' where goodsid=' . $id . ' and id not in ( ' . implode(',', $optionids) . ')');
-					$sql = 'update ' . tablename('ewei_shop_creditshop_goods') . " g set\n\t\t\t\t\tg.mincredit = (select min(credit) from " . tablename('ewei_shop_creditshop_option') . ' where goodsid = ' . $id . "),\n\t\t\t\t\tg.minmoney = (select min(money) from " . tablename('ewei_shop_creditshop_option') . ' where goodsid = ' . $id . "),\n\t\t\t\t\tg.maxcredit = (select max(credit) from " . tablename('ewei_shop_creditshop_option') . ' where goodsid = ' . $id . "),\n\t\t\t\t\tg.maxmoney = (select max(money) from " . tablename('ewei_shop_creditshop_option') . ' where goodsid = ' . $id . ")\n\t\t\t\t\twhere g.id = " . $id . ' and g.hasoption=1';
+					$sql = 'update ' . tablename('ewei_shop_creditshop_goods') . ' g set' . "\n\t\t\t\t\t" . 'g.mincredit = (select min(credit) from ' . tablename('ewei_shop_creditshop_option') . ' where goodsid = ' . $id . '),' . "\n\t\t\t\t\t" . 'g.minmoney = (select min(money) from ' . tablename('ewei_shop_creditshop_option') . ' where goodsid = ' . $id . '),' . "\n\t\t\t\t\t" . 'g.maxcredit = (select max(credit) from ' . tablename('ewei_shop_creditshop_option') . ' where goodsid = ' . $id . '),' . "\n\t\t\t\t\t" . 'g.maxmoney = (select max(money) from ' . tablename('ewei_shop_creditshop_option') . ' where goodsid = ' . $id . ')' . "\n\t\t\t\t\t" . 'where g.id = ' . $id . ' and g.hasoption=1';
 					pdo_query($sql);
 				}
-				else {
+				 else {
 					pdo_query('delete from ' . tablename('ewei_shop_creditshop_option') . ' where goodsid=' . $id);
 					$sql = 'update ' . tablename('ewei_shop_creditshop_goods') . ' set minmoney = money,maxmoney = money,mincredit = credit,maxcredit = credit where id = ' . $id . ' and hasoption=0;';
 					pdo_query($sql);
@@ -590,10 +618,13 @@ class Goods_EweiShopV2Page extends PluginWebPage
 				if ($data['hasoption'] !== 0) {
 					pdo_update('ewei_shop_creditshop_goods', array('total' => $totalstocks), array('id' => $id));
 				}
+
 			}
+
 
 			show_json(1, array('url' => webUrl('creditshop/goods/edit', array('id' => $id, 'tab' => str_replace('#tab_', '', $_GPC['tab'])))));
 		}
+
 
 		include $this->template();
 	}
@@ -605,12 +636,13 @@ class Goods_EweiShopV2Page extends PluginWebPage
 		$id = intval($_GPC['id']);
 
 		if (empty($id)) {
-			$id = (is_array($_GPC['ids']) ? implode(',', $_GPC['ids']) : 0);
+			$id = ((is_array($_GPC['ids']) ? implode(',', $_GPC['ids']) : 0));
 		}
+
 
 		$items = pdo_fetchall('SELECT id,title FROM ' . tablename('ewei_shop_creditshop_goods') . ' WHERE id in( ' . $id . ' ) AND uniacid=' . $_W['uniacid']);
 
-		foreach ($items as $item) {
+		foreach ($items as $item ) {
 			pdo_update('ewei_shop_creditshop_goods', array('deleted' => 1), array('id' => $item['id'], 'uniacid' => $_W['uniacid']));
 			plog('creditshop.goods.delete', '删除积分商城商品 ID: ' . $item['id'] . '  <br/>商品名称: ' . $item['title'] . ' ');
 		}
@@ -625,12 +657,13 @@ class Goods_EweiShopV2Page extends PluginWebPage
 		$id = intval($_GPC['id']);
 
 		if (empty($id)) {
-			$id = (is_array($_GPC['ids']) ? implode(',', $_GPC['ids']) : 0);
+			$id = ((is_array($_GPC['ids']) ? implode(',', $_GPC['ids']) : 0));
 		}
+
 
 		$items = pdo_fetchall('SELECT id,title FROM ' . tablename('ewei_shop_creditshop_goods') . ' WHERE id in( ' . $id . ' ) AND uniacid=' . $_W['uniacid']);
 
-		foreach ($items as $item) {
+		foreach ($items as $item ) {
 			pdo_delete('ewei_shop_creditshop_goods', array('id' => $item['id']));
 			plog('creditshop.goods.deleted', '从回收站彻底删除商品<br/>ID: ' . $item['id'] . '<br/>商品名称: ' . $item['title']);
 		}
@@ -645,12 +678,13 @@ class Goods_EweiShopV2Page extends PluginWebPage
 		$id = intval($_GPC['id']);
 
 		if (empty($id)) {
-			$id = (is_array($_GPC['ids']) ? implode(',', $_GPC['ids']) : 0);
+			$id = ((is_array($_GPC['ids']) ? implode(',', $_GPC['ids']) : 0));
 		}
+
 
 		$items = pdo_fetchall('SELECT id,title FROM ' . tablename('ewei_shop_creditshop_goods') . ' WHERE id in( ' . $id . ' ) AND uniacid=' . $_W['uniacid']);
 
-		foreach ($items as $item) {
+		foreach ($items as $item ) {
 			pdo_update('ewei_shop_creditshop_goods', array('status' => 0, 'deleted' => 0), array('id' => $item['id']));
 			plog('creditshop.goods.edit', '从回收站恢复商品<br/>ID: ' . $item['id'] . '<br/>商品名称: ' . $item['title']);
 		}
@@ -672,25 +706,25 @@ class Goods_EweiShopV2Page extends PluginWebPage
 
 			if ($type == 'istop') {
 				$typestr = '置顶';
-				$statusstr = ($value == 1 ? '置顶' : '取消置顶');
+				$statusstr = (($value == 1 ? '置顶' : '取消置顶'));
 			}
-			else if ($type == 'isrecommand') {
+			 else if ($type == 'isrecommand') {
 				$typestr = '推荐';
-				$statusstr = ($value == 1 ? '推荐' : '取消推荐');
+				$statusstr = (($value == 1 ? '推荐' : '取消推荐'));
 			}
-			else if ($type == 'status') {
+			 else if ($type == 'status') {
 				$typestr = '上下架';
-				$statusstr = ($value == 1 ? '上架' : '下架');
+				$statusstr = (($value == 1 ? '上架' : '下架'));
 			}
-			else {
-				if ($type == 'displayorder') {
-					$typestr = '排序';
-					$statusstr = '序号 ' . $value;
-				}
+			 else if ($type == 'displayorder') {
+				$typestr = '排序';
+				$statusstr = '序号 ' . $value;
 			}
+
 
 			plog('creditshop.goods.edit', '修改积分商城商品' . $typestr . '状态   ID: ' . $id . ' ' . $statusstr . ' ');
 		}
+
 
 		show_json(1);
 	}
@@ -703,36 +737,38 @@ class Goods_EweiShopV2Page extends PluginWebPage
 		$type = intval($_GPC['type']);
 		$params = array();
 		$params[':uniacid'] = $_W['uniacid'];
-		$condition = " and status=1 and deleted=0 and uniacid=:uniacid and type = 1 and groupstype = 0 \n                    and isdiscount = 0 and istime = 0 and bargain = 0 and ispresell = 0 ";
+		$condition = ' and status=1 and deleted=0 and uniacid=:uniacid and type = 1 and groupstype = 0 ' . "\n" . '                    and isdiscount = 0 and istime = 0 and bargain = 0 and ispresell = 0 ';
 
-		if (!empty($kwd)) {
+		if (!(empty($kwd))) {
 			$condition .= ' AND (`title` LIKE :keywords OR `keywords` LIKE :keywords)';
 			$params[':keywords'] = '%' . $kwd . '%';
 		}
 
+
 		if (empty($type)) {
 			$condition .= ' AND `type` != 10 ';
 		}
-		else {
+		 else {
 			$condition .= ' AND `type` = :type ';
 			$params[':type'] = $type;
 		}
 
 		$list = array();
-		$list = pdo_fetchall("SELECT id,title,thumb,marketprice,productprice,share_title,share_icon,description,minprice,costprice,total,content,hasoption\n              FROM " . tablename('ewei_shop_goods') . ' WHERE 1 ' . $condition . ' order by createtime desc', $params);
+		$list = pdo_fetchall('SELECT id,title,thumb,marketprice,productprice,share_title,share_icon,description,minprice,costprice,total,content,hasoption' . "\n" . '              FROM ' . tablename('ewei_shop_goods') . ' WHERE 1 ' . $condition . ' order by createtime desc', $params);
 		$list = set_medias($list, array('thumb', 'share_icon'));
 
-		foreach ($list as $key => $value) {
+		foreach ($list as $key => $value ) {
 			if (intval($value['hasoption']) == 1) {
 				$allspecs = pdo_fetchall('select * from ' . tablename('ewei_shop_goods_spec') . ' where goodsid=:id order by displayorder asc', array(':id' => $value['id']));
 
-				foreach ($allspecs as &$s) {
+				foreach ($allspecs as &$s ) {
 					$s['items'] = pdo_fetchall('select a.id,a.specid,a.title,a.thumb,a.show,a.displayorder,a.valueId,a.virtual,b.title as title2 from ' . tablename('ewei_shop_goods_spec_item') . ' a left join ' . tablename('ewei_shop_virtual_type') . ' b on b.id=a.virtual  where a.specid=:specid order by a.displayorder asc', array(':specid' => $s['id']));
 				}
 
 				unset($s);
 				$options = pdo_fetchall('select * from ' . tablename('ewei_shop_goods_option') . ' where goodsid=:id order by id asc', array(':id' => $value['id']));
 			}
+
 
 			$list[$key]['allspecs'] = $allspecs;
 			$list[$key]['options'] = $options;
@@ -741,6 +777,7 @@ class Goods_EweiShopV2Page extends PluginWebPage
 		if ($_GPC['suggest']) {
 			exit(json_encode(array('value' => $list)));
 		}
+
 
 		include $this->template();
 	}
@@ -754,15 +791,17 @@ class Goods_EweiShopV2Page extends PluginWebPage
 		$params[':uniacid'] = $_W['uniacid'];
 		$condition = ' and status=1 and deleted=0 and uniacid=:uniacid';
 
-		if (!empty($kwd)) {
+		if (!(empty($kwd))) {
 			$condition .= ' AND `title` LIKE :keywords';
 			$params[':keywords'] = '%' . $kwd . '%';
 		}
+
 
 		$list = pdo_fetchall('SELECT *, money as minprice FROM ' . tablename('ewei_shop_creditshop_goods') . ' WHERE 1 ' . $condition . ' order by createtime desc', $params);
 		$list = set_medias($list, array('thumb'));
 		include $this->template();
 	}
 }
+
 
 ?>

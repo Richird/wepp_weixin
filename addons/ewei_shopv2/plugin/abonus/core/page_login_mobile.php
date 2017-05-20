@@ -1,5 +1,5 @@
 <?php
-//weichengtech
+
 if (!defined('IN_IA')) {
 	exit('Access Denied');
 }
@@ -11,6 +11,7 @@ class AbonusMobileLoginPage extends PluginMobileLoginPage
 		parent::__construct();
 		global $_W;
 		global $_GPC;
+
 		if (($_W['action'] != 'register') && ($_W['action'] != 'myshop') && ($_W['action'] != 'share')) {
 			$member = m('member')->getMember($_W['openid']);
 			if (empty($member['isagent']) || empty($member['status'])) {
@@ -18,19 +19,23 @@ class AbonusMobileLoginPage extends PluginMobileLoginPage
 				exit();
 			}
 
+
 			if (empty($member['isaagent']) || empty($member['aagentstatus'])) {
 				header('location: ' . mobileUrl('abonus/register'));
 				exit();
 			}
+
 		}
+
 	}
 
-	public function footerMenus($diymenuid = NULL, $p = NULL)
+	public function footerMenus($diymenuid = NULL)
 	{
 		global $_W;
 		global $_GPC;
 		include $this->template('abonus/_menu');
 	}
 }
+
 
 ?>

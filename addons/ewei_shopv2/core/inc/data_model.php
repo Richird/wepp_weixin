@@ -1,5 +1,8 @@
 <?php
-//weichengtech
+if (!(defined('IN_IA'))) {
+	exit('Access Denied');
+}
+
 class DataModel
 {
 	public function read($key = '')
@@ -17,8 +20,5 @@ class DataModel
 	}
 }
 
-if (!defined('IN_IA')) {
-	exit('Access Denied');
-}
 
 ?>

@@ -1,9 +1,9 @@
 <?php
-//weichengtech
-if (!defined('IN_IA')) {
-	exit('Access Denied');
-}
 
+if (!defined('IN_IA')) {
+	exit('Access Denied');
+}
+
 class Util_EweiShopV2Page extends WebPage
 {
 	public function autonum()
@@ -16,32 +16,34 @@ class Util_EweiShopV2Page extends WebPage
 		$arr = array($num);
 		$maxlen = strlen($num);
 		$i = 1;
-
-		while ($i <= $len) {
+
+		while ($i <= $len) {
 			$add = bcadd($num, $i) . '';
 			$addlen = strlen($add);
-
-			if ($maxlen < $addlen) {
+
+			if ($maxlen < $addlen) {
 				$maxlen = $addlen;
-			}
-
+			}
+
+
 			$arr[] = $add;
 			++$i;
-		}
-
+		}
+
 		$len = count($arr);
 		$i = 0;
-
-		while ($i < $len) {
+
+		while ($i < $len) {
 			$zerocount = $maxlen - strlen($arr[$i]);
-
-			if (0 < $zerocount) {
+
+			if (0 < $zerocount) {
 				$arr[$i] = str_pad($arr[$i], $maxlen, '0', STR_PAD_LEFT);
-			}
-
+			}
+
+
 			++$i;
-		}
-
+		}
+
 		exit(json_encode($arr));
 	}
 
@@ -64,5 +66,6 @@ class Util_EweiShopV2Page extends WebPage
 		include $this->template();
 	}
 }
+
 
 ?>
