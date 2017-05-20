@@ -122,6 +122,20 @@ class Cache_EweiShopV2Model
 
 		cache_write($this->get_key($key, $uniacid), $value);
 	}
+
+	public function del($key, $uniacid = '')
+	{
+		if (function_exists('redis')) {
+			$redis = redis();
+
+			if (!is_error($redis)) {
+				$redis->del($this->get_key($key, $uniacid));
+				return NULL;
+			}
+		}
+
+		cache_delete($this->get_key($key, $uniacid));
+	}
 }
 
 if (!defined('IN_IA')) {

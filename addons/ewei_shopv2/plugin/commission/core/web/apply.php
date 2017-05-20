@@ -1018,7 +1018,7 @@ class Apply_EweiShopV2Page extends PluginWebPage
 				pdo_update('ewei_shop_order_goods', array('commissions' => iserializer($commissions)), array('id' => $og['id']));
 			}
 
-			plog('commission.changecommission', '修改佣金 订单号: ' . $order['ordersn']);
+			plog('commission.apply.changecommission', '修改佣金 订单号: ' . $order['ordersn']);
 			show_json(1, array('url' => referer()));
 		}
 

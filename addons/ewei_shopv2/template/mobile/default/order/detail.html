@@ -365,7 +365,7 @@
                 <div class="fui-cell-info"></div>
                 <div class="fui-cell-remark noremark">&yen; {$order['dispatchprice']}</div>
             </div>
-            {if !empty($order['lotterydiscountprice'])}
+            {if !empty($order['lotterydiscountprice']) && $order['lotterydiscountprice']>0}
             <div class="fui-cell">
                 <div class="fui-cell-label">抽奖优惠</div>
                 <div class="fui-cell-info"></div>

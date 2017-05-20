@@ -323,9 +323,13 @@ class DiypageModel extends PluginModel
 										if ($child['type'] == 'yushou') {
 											$hasyushou = true;
 										}
-
-										if ($child['type'] == 'coupon') {
+										else if ($child['type'] == 'coupon') {
 											$hascoupon = true;
+										}
+										else {
+											if ($child['type'] == 'zengpin') {
+												$haszengpin = true;
+											}
 										}
 									}
 
@@ -338,6 +342,12 @@ class DiypageModel extends PluginModel
 									if (!$hascoupon) {
 										$childid = 'C' . time() . rand(100, 999);
 										$item['data'][$childid] = array('name' => '可用优惠券', 'type' => 'coupon');
+										unset($childid);
+									}
+
+									if (!$haszengpin) {
+										$childid = 'C' . time() . rand(100, 999);
+										$item['data'][$childid] = array('name' => '赠品', 'type' => 'zengpin');
 										unset($childid);
 									}
 								}

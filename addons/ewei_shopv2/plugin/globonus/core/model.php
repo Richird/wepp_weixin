@@ -777,7 +777,7 @@ if (!class_exists('GlobonusModel')) {
 
 					$price = ($o['price'] * $set['bonusrate']) / 100;
 					!isset($p['bonusmoney']) && $p['bonusmoney'] = 0;
-					$p['bonusmoney'] += round(($price * $p['bonus']) / 100, 2);
+					$p['bonusmoney'] += floatval(($price * $p['bonus']) / 100);
 				}
 
 				unset($p);

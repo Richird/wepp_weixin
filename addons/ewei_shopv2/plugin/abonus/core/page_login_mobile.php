@@ -25,7 +25,7 @@ class AbonusMobileLoginPage extends PluginMobileLoginPage
 		}
 	}
 
-	public function footerMenus($diymenuid = NULL)
+	public function footerMenus($diymenuid = NULL, $p = NULL)
 	{
 		global $_W;
 		global $_GPC;

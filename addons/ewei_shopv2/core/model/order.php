@@ -87,10 +87,10 @@ class Order_EweiShopV2Model
 				}
 
 				if (p('lottery')) {
-					$res = p('lottery')->getLottery($_W['openid'], 1, array('money' => $order['price'], 'paytype' => 1));
+					$res = p('lottery')->getLottery($order['openid'], 1, array('money' => $order['price'], 'paytype' => 1));
 
 					if ($res) {
-						p('lottery')->getLotteryList($_W['openid'], array('lottery_id' => $res));
+						p('lottery')->getLotteryList($order['openid'], array('lottery_id' => $res));
 					}
 				}
 			}
@@ -296,10 +296,12 @@ class Order_EweiShopV2Model
 			$param[':orderid'] = $orderid;
 		}
 
-		$goods = pdo_fetchall('select og.goodsid,og.total,g.totalcnf,og.realprice,g.credit,og.optionid,g.total as goodstotal,og.optionid,g.sales,g.salesreal from ' . tablename('ewei_shop_order_goods') . ' og ' . ' left join ' . tablename('ewei_shop_goods') . ' g on g.id=og.goodsid ' . ' where ' . $condition . ' and og.uniacid=:uniacid ', $param);
+		$goods = pdo_fetchall('select og.goodsid,og.total,g.totalcnf,og.realprice,g.credit,og.optionid,og.optionid,g.sales,g.salesreal from ' . tablename('ewei_shop_order_goods') . ' og ' . ' left join ' . tablename('ewei_shop_goods') . ' g on g.id=og.goodsid ' . ' where ' . $condition . ' and og.uniacid=:uniacid ', $param);
 		$credits = 0;
 
 		foreach ($goods as $g) {
+			$goods_item = pdo_fetch('select total as goodstotal from' . tablename('ewei_shop_goods') . ' where id=:id and uniacid=:uniacid limit 1', array(':id' => $g['goodsid'], ':uniacid' => $_W['uniacid']));
+			$g['goodstotal'] = $goods_item['goodstotal'];
 			$stocktype = 0;
 
 			if ($type == 0) {
@@ -1205,20 +1207,15 @@ class Order_EweiShopV2Model
 								$saleset_free = 1;
 							}
 							else {
-								$areas = explode(';', $saleset['enoughareas']);
-
-								if (!empty($address)) {
-									if (!in_array($address['city'], $areas)) {
-										$saleset_free = 1;
-									}
-								}
-								else if (!empty($member['city'])) {
-									if (!in_array($member['city'], $areas)) {
-										$saleset_free = 1;
-									}
+								if (empty($new_area)) {
+									$areas = explode(';', trim($saleset['enoughareas'], ';'));
 								}
 								else {
-									if (empty($member['city'])) {
+									$areas = explode(';', trim($saleset['enoughareas_code'], ';'));
+								}
+
+								if (!empty($user_city_code)) {
+									if (!in_array($user_city_code, $areas)) {
 										$saleset_free = 1;
 									}
 								}

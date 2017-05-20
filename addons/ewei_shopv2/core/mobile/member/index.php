@@ -35,7 +35,6 @@ class Index_EweiShopV2Page extends MobileLoginPage
 			$sql .= ' where d.openid=:openid and d.uniacid=:uniacid and  d.used=0 ';
 			$sql .= ' and (   (c.timelimit = 0 and ( c.timedays=0 or c.timedays*86400 + d.gettime >=unix_timestamp() ) )  or  (c.timelimit =1 and c.timestart<=' . $time . ' && c.timeend>=' . $time . ')) order by d.gettime desc';
 			$statics['coupon'] = pdo_fetchcolumn($sql, array(':openid' => $_W['openid'], ':uniacid' => $_W['uniacid']));
-			$statics['newcoupon'] = pdo_fetchcolumn('SELECT 1  FROM ' . tablename('ewei_shop_coupon_data') . ' where openid=:openid and uniacid=:uniacid and  isnew=1', array(':openid' => $_W['openid'], ':uniacid' => $_W['uniacid']));
 			$pcset = $_W['shopset']['coupon'];
 
 			if (empty($pcset['closemember'])) {
@@ -53,6 +52,14 @@ class Index_EweiShopV2Page extends MobileLoginPage
 		if ($plugin_globonus) {
 			$plugin_globonus_set = $plugin_globonus->getSet();
 			$hasglobonus = !empty($plugin_globonus_set['open']) && !empty($plugin_globonus_set['openmembercenter']);
+		}
+
+		$hasThreen = false;
+		$hasThreen = p('threen');
+
+		if ($hasThreen) {
+			$plugin_threen_set = $hasThreen->getSet();
+			$hasThreen = !empty($plugin_threen_set['open']) && !empty($plugin_threen_set['threencenter']);
 		}
 
 		$hasauthor = false;
@@ -90,6 +97,16 @@ class Index_EweiShopV2Page extends MobileLoginPage
 			if (!empty($com_sign_set['iscenter']) && !empty($com_sign_set['isopen'])) {
 				$hassign = (empty($_W['shopset']['trade']['credittext']) ? '积分' : $_W['shopset']['trade']['credittext']);
 				$hassign .= (empty($com_sign_set['textsign']) ? '签到' : $com_sign_set['textsign']);
+			}
+		}
+
+		$hasLineUp = false;
+		$lineUp = p('lineup');
+
+		if ($lineUp) {
+			$lineUpSet = $lineUp->getSet();
+			if (!empty($lineUpSet['isopen']) && !empty($lineUpSet['mobile_show'])) {
+				$hasLineUp = true;
 			}
 		}
 

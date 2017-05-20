@@ -6,7 +6,7 @@ if (!defined('IN_IA')) {
 
 class DiyformModel extends PluginModel
 {
-	public $_data_type_config = array(0 => '单行文本', 1 => '多行文本', 2 => '下拉框', 3 => '多选框', 5 => '图片', 6 => '身份证号码', 7 => '日期', 8 => '日期范围', 9 => '城市', 10 => '确认文本');
+	public $_data_type_config = array(0 => '单行文本', 1 => '多行文本', 2 => '下拉框', 3 => '多选框', 5 => '图片', 6 => '身份证号码', 7 => '日期', 8 => '日期范围', 9 => '城市', 10 => '确认文本', 11 => '时间', 12 => '时间范围');
 	public $_default_data_config = array('', '自定义', '姓名', '电话', '微信号');
 	public $_default_date_config = array('', '填写当天', '特定日期');
 
@@ -126,7 +126,7 @@ class DiyformModel extends PluginModel
 		$mc_data = array();
 
 		foreach ($fields as $key => $value) {
-			if ($array) {
+			if ($array && isset($fields[0])) {
 				$key = $value['diy_type'];
 			}
 
@@ -182,38 +182,57 @@ class DiyformModel extends PluginModel
 
 						$data[$key] = $newdata;
 					}
+					else if (is_array($memberdata[$key])) {
+						$data[$key] = $memberdata[$key];
+					}
 					else {
 						$data[$key] = array();
 					}
 				}
 			}
-			else if ($data_type == 6) {
-				$data[$key] = trim($memberdata[$key]);
-			}
-			else if ($data_type == 7) {
-				$data[$key] = trim($memberdata[$key]);
-			}
-			else if ($data_type == 8) {
-				if ($array) {
-					$data[$key] = array(trim($memberdata[$key][0]), trim($memberdata[$key][1]));
+			else {
+				if (($data_type == 6) || ($data_type == 7) || ($data_type == 11)) {
+					$data[$key] = trim($memberdata[$key]);
 				}
 				else {
-					$data[$key] = array(trim($memberdata[$key . '_0']), trim($memberdata[$key . '_1']));
+					if (($data_type == 8) || ($data_type == 12)) {
+						$data[$key] = array(trim($memberdata[$key][0]), trim($memberdata[$key][1]));
+					}
+					else if ($data_type == 9) {
+						if ($array) {
+							if (is_string($memberdata[$key])) {
+								$areas = explode(' ', $memberdata[$key]);
+								$data[$key]['province'] = $areas[0];
+								$data[$key]['city'] = $areas[1];
+								$data[$key]['area'] = $areas[2];
+								$data[$key]['value'] = $areas[3];
+							}
+							else {
+								$data[$key]['province'] = trim($memberdata[$key]['province']);
+								$data[$key]['city'] = trim($memberdata[$key]['city']);
+								$data[$key]['area'] = trim($memberdata[$key]['area']);
+								$data[$key]['value'] = trim($memberdata[$key]['value']);
+							}
+						}
+						else {
+							$data[$key]['province'] = trim($memberdata[$key][0]);
+							$data[$key]['city'] = trim($memberdata[$key][1]);
+							$data[$key]['area'] = trim($memberdata[$key][2]);
+							$data[$key]['value'] = trim($memberdata[$key][3]);
+						}
+					}
+					else if ($data_type == 10) {
+						if ($array) {
+							$data[$key] = array('name1' => trim($memberdata[$key]['name1']), 'name2' => trim($memberdata[$key]['name2']));
+						}
+						else {
+							$data[$key] = array('name1' => trim($memberdata[$key][0]), 'name2' => trim($memberdata[$key][1]));
+						}
+					}
+					else {
+						$data[$key] = trim($memberdata[$key]);
+					}
 				}
-			}
-			else if ($data_type == 9) {
-				$data[$key] = array('province' => isset($memberdata[$key]['province']) && trim($memberdata[$key]['province']), 'city' => isset($memberdata[$key]['city']) && trim($memberdata[$key]['city']));
-				$area = trim($memberdata[$key][2]);
-
-				if (!empty($area)) {
-					$data[$key]['area'] = $area;
-				}
-			}
-			else if ($data_type == 10) {
-				$data[$key] = array('name1' => trim($memberdata[$key]['name1']), 'name2' => trim($memberdata[$key]['name2']));
-			}
-			else {
-				$data[$key] = trim($memberdata[$key]);
 			}
 		}
 
@@ -587,11 +606,11 @@ class DiyformModel extends PluginModel
 
 		foreach ($fields as $key => $value) {
 			$tp_value = '';
-			if (($value['data_type'] == 0) || ($value['data_type'] == 1) || ($value['data_type'] == 2) || ($value['data_type'] == 6) || ($value['data_type'] == 7)) {
+			if (($value['data_type'] == 0) || ($value['data_type'] == 1) || ($value['data_type'] == 2) || ($value['data_type'] == 6) || ($value['data_type'] == 7) || ($value['data_type'] == 11)) {
 				$tp_value = str_replace("\n", '<br/>', $data[$key]);
 			}
 			else {
-				if (($value['data_type'] == 3) || ($value['data_type'] == 8)) {
+				if (($value['data_type'] == 3) || ($value['data_type'] == 8) || ($value['data_type'] == 12)) {
 					if (is_array($data[$key])) {
 						foreach ($data[$key] as $k1 => $v1) {
 							$tp_value .= $v1 . ' ';
@@ -641,29 +660,40 @@ class DiyformModel extends PluginModel
 
 		foreach ($fields as $field => $value) {
 			$tp_value = '';
-			if (($value['data_type'] == 0) || ($value['data_type'] == 1) || ($value['data_type'] == 2) || ($value['data_type'] == 6) || ($value['data_type'] == 7)) {
+			if (($value['data_type'] == 0) || ($value['data_type'] == 1) || ($value['data_type'] == 2) || ($value['data_type'] == 6) || ($value['data_type'] == 7) || ($value['data_type'] == 11)) {
 				$tp_value = trim($_GPC[$field_data_name . $key]);
 				if (empty($tp_value) && $value['tp_must']) {
 					return error(-1, '请填写' . $value['tp_name']);
 				}
 			}
-			else {
-				if (($value['data_type'] == 3) || ($value['data_type'] == 8)) {
-					if (is_array($_GPC[$field_data_name . $key])) {
-						foreach ($_GPC[$field_data_name . $key] as $k1 => $v1) {
-							$tp_value .= trim($v1) . ' ';
-						}
-					}
-
-					if (empty($tp_value) && $value['tp_must']) {
-						return error(-1, '请选择' . $value['tp_name']);
+			else if ($value['data_type'] == 3) {
+				if (is_array($_GPC[$field_data_name . $key])) {
+					foreach ($_GPC[$field_data_name . $key] as $k1 => $v1) {
+						$tp_value .= trim($v1) . ' ';
 					}
 				}
-				else if ($value['data_type'] == 5) {
-					$tp_value = array();
 
+				if (empty($tp_value) && $value['tp_must']) {
+					return error(-1, '请选择' . $value['tp_name']);
+				}
+			}
+			else if ($value['data_type'] == 5) {
+				$tp_value = array();
+
+				if (is_array($_GPC[$field_data_name . $key])) {
+					$tp_value = $_GPC[$field_data_name . $key];
+				}
+
+				if (empty($tp_value) && $value['tp_must']) {
+					return error(-1, '请选择' . $value['tp_name']);
+				}
+			}
+			else {
+				if (($value['data_type'] == 8) || ($value['data_type'] == 12)) {
 					if (is_array($_GPC[$field_data_name . $key])) {
-						$tp_value = $_GPC[$field_data_name . $key];
+						foreach ($_GPC[$field_data_name . $key] as $k1 => $v1) {
+							$tp_value[] = trim($v1);
+						}
 					}
 
 					if (empty($tp_value) && $value['tp_must']) {
@@ -681,6 +711,10 @@ class DiyformModel extends PluginModel
 							$tp_value['city'] = $_GPC[$field_data_name . '_city' . $key];
 						}
 
+						if (($_GPC[$field_data_name . '_area' . $key] != '请选择区域') && !empty($_GPC[$field_data_name . '_area' . $key])) {
+							$tp_value['area'] = $_GPC[$field_data_name . '_area' . $key];
+						}
+
 						if ((!isset($tp_value['province']) || !isset($tp_value['city'])) && $value['tp_must']) {
 							return error(-1, '请选择' . $value['tp_name']);
 						}
@@ -695,15 +729,39 @@ class DiyformModel extends PluginModel
 		return $diyformfields;
 	}
 
-	public function wxApp($fields, $f_data)
+	public function wxApp($fields, $f_data, $member = array())
 	{
 		$newFields = array();
+		if (empty($f_data) || !is_array($f_data)) {
+			$f_data = array();
+		}
+
 		if (!empty($fields) && is_array($fields)) {
 			foreach ($fields as $k => $v) {
 				$v['diy_type'] = $k;
 
 				if (empty($v['placeholder'])) {
 					$v['placeholder'] = '请输入' . $v['tp_name'];
+				}
+
+				if ($v['data_type'] == 0) {
+					switch ($v['tp_is_default']) {
+					case 1:
+						$f_data[$k] = $v['tp_default'];
+						break;
+
+					case 2:
+						$f_data[$k] = $member['realname'];
+						break;
+
+					case 3:
+						$f_data[$k] = $member['mobile'];
+						break;
+
+					case 4:
+						$f_data[$k] = $member['weixin'];
+						break;
+					}
 				}
 
 				if ($v['data_type'] == 2) {
@@ -755,9 +813,57 @@ class DiyformModel extends PluginModel
 	);
 						}
 					}
+					else if ($v['data_type'] == 7) {
+						switch ($v['default_time_type']) {
+						case 0:
+							$f_data[$k] = '';
+							break;
+
+						case 1:
+							$f_data[$k] = date('Y-m-d');
+							break;
+
+						case 2:
+							$f_data[$k] = $v['default_time'];
+							break;
+						}
+					}
 					else {
-						if (($v['data_type'] == 10) && (empty($f_data[$k]) || !is_array($f_data[$k]))) {
-							$f_data[$k] = array('name1' => '', 'name2' => '');
+						if (($v['data_type'] == 8) && !is_array($f_data[$k])) {
+							$f_data[$k] = array();
+
+							switch ($v['default_btime_type']) {
+							case 0:
+								$f_data[$k][0] = '';
+								break;
+
+							case 1:
+								$f_data[$k][0] = date('Y-m-d');
+								break;
+
+							case 2:
+								$f_data[$k][0] = $v['default_btime'];
+								break;
+							}
+
+							switch ($v['default_etime_type']) {
+							case 0:
+								$f_data[$k][1] = '';
+								break;
+
+							case 1:
+								$f_data[$k][1] = date('Y-m-d');
+								break;
+
+							case 2:
+								$f_data[$k][1] = $v['default_etime'];
+								break;
+							}
+						}
+						else {
+							if (($v['data_type'] == 10) && (empty($f_data[$k]) || !is_array($f_data[$k]))) {
+								$f_data[$k] = array('name1' => '', 'name2' => '');
+							}
 						}
 					}
 				}
@@ -766,7 +872,23 @@ class DiyformModel extends PluginModel
 			}
 		}
 
-		return array('fields' => $newFields, 'f_data' => $f_data);
+		return array('fields' => $newFields, 'f_data' => array_filter($f_data));
+	}
+
+	public function getInsertFields($fields)
+	{
+		if (!is_array($fields)) {
+			return array();
+		}
+
+		$newFields = array();
+
+		foreach ($fields as $index => $field) {
+			$newFields[$field['diy_type']] = $field;
+			unset($newFields[$field['diy_type']]['diy_type']);
+		}
+
+		return iserializer($newFields);
 	}
 }
 

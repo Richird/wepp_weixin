@@ -40,9 +40,12 @@ if (!empty($ordersn)) {
 	else if ($paytype == 1) {
 		$url = $_W['siteroot'] . '../../app/index.php?i=' . $uniacid . '&c=entry&m=ewei_shopv2&do=mobile&r=order.pay_alipay.recharge_complete&alidata=' . $get;
 	}
+	else if ($paytype == 2) {
+		$url = $_W['siteroot'] . '../../app/index.php?i=' . $uniacid . '&c=entry&m=ewei_shopv2&do=mobile&r=cashier.pay.success&cashierid=' . $cashierid . '&orderid=' . $ordersn;
+	}
 	else {
-		if ($paytype == 2) {
-			$url = $_W['siteroot'] . '../../app/index.php?i=' . $uniacid . '&c=entry&m=ewei_shopv2&do=mobile&r=cashier.pay.success&cashierid=' . $cashierid . '&orderid=' . $ordersn;
+		if ($paytype == 6) {
+			$url = $_W['siteroot'] . '../../app/index.php?i=' . $uniacid . '&c=entry&m=ewei_shopv2&do=mobile&r=threen.register.threen_complete&alidata=' . $get;
 		}
 	}
 }

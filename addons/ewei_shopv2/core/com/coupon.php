@@ -173,7 +173,7 @@ class Coupon_EweiShopV2ComModel extends ComModel
 				if ($row['backtype'] == 0) {
 					$row['backstr'] = '立减';
 					$row['css'] = 'deduct';
-					$row['backmoney'] = $row['deduct'];
+					$row['backmoney'] = (double) $row['deduct'];
 					$row['backpre'] = true;
 
 					if ($row['enough'] == '0') {
@@ -186,7 +186,7 @@ class Coupon_EweiShopV2ComModel extends ComModel
 				else if ($row['backtype'] == 1) {
 					$row['backstr'] = '折';
 					$row['css'] = 'discount';
-					$row['backmoney'] = $row['discount'];
+					$row['backmoney'] = (double) $row['discount'];
 					$row['color'] = 'red ';
 				}
 				else {
@@ -201,20 +201,20 @@ class Coupon_EweiShopV2ComModel extends ComModel
 						if (0 < $row['backredpack']) {
 							$row['backstr'] = '返现';
 							$row['css'] = 'redpack';
-							$row['backmoney'] = $row['backredpack'];
+							$row['backmoney'] = (double) $row['backredpack'];
 							$row['backpre'] = true;
 						}
 						else if (0 < $row['backmoney']) {
 							$row['backstr'] = '返利';
 							$row['css'] = 'money';
-							$row['backmoney'] = $row['backmoney'];
+							$row['backmoney'] = (double) $row['backmoney'];
 							$row['backpre'] = true;
 						}
 						else {
 							if (!empty($row['backcredit'])) {
 								$row['backstr'] = '返积分';
 								$row['css'] = 'credit';
-								$row['backmoney'] = $row['backcredit'];
+								$row['backmoney'] = (double) $row['backcredit'];
 							}
 						}
 					}

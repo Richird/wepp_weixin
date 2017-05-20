@@ -19,7 +19,17 @@ class Bind_EweiShopV2Page extends MobileLoginPage
 	{
 		global $_W;
 		global $_GPC;
+		@session_start();
 		$member = m('member')->getMember($_W['openid']);
+		$wapset = m('common')->getSysset('wap');
+		$appset = m('common')->getSysset('app');
+
+		if (!p('threen')) {
+			if (empty($wapset['open']) && !empty($appset['isclose'])) {
+				$this->message('未开启绑定设置');
+			}
+		}
+
 		$bind = (!empty($member['mobile']) && !empty($member['mobileverify']) ? 1 : 0);
 
 		if ($_W['ispost']) {
@@ -27,7 +37,6 @@ class Bind_EweiShopV2Page extends MobileLoginPage
 			$verifycode = trim($_GPC['verifycode']);
 			$pwd = trim($_GPC['pwd']);
 			$confirm = intval($_GPC['confirm']);
-			@session_start();
 			$key = '__ewei_shopv2_member_verifycodesession_' . $_W['uniacid'] . '_' . $mobile;
 			if (!isset($_SESSION[$key]) || ($_SESSION[$key] !== $verifycode) || !isset($_SESSION['verifycodesendtime']) || (($_SESSION['verifycodesendtime'] + 600) < time())) {
 				show_json(0, '验证码错误或已过期');

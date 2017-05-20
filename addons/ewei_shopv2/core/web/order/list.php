@@ -35,7 +35,6 @@ class List_EweiShopV2Page extends WebPage
 		$condition = ' o.uniacid = :uniacid and o.ismr=0 and o.deleted=0 and o.isparent=0';
 		$uniacid = $_W['uniacid'];
 		$paras = $paras1 = array(':uniacid' => $uniacid);
-		$merch_plugin = p('merch');
 		$merch_data = m('common')->getPluginset('merch');
 		if (empty($starttime) || empty($endtime)) {
 			$starttime = strtotime('-1 month');
@@ -299,7 +298,7 @@ class List_EweiShopV2Page extends WebPage
 
 			foreach ($list as &$value) {
 				if ($is_merchname == 1) {
-					$value['merchname'] = $merch_user[$value['merchid']]['merchname'] ? $merch_user[$value['merchid']]['merchname'] : $_W['shopset']['shop']['name'];
+					$value['merchname'] = $merch_user[$value['merchid']]['merchname'] ? $merch_user[$value['merchid']]['merchname'] : '';
 				}
 
 				$s = $value['status'];
@@ -446,7 +445,10 @@ class List_EweiShopV2Page extends WebPage
 							else {
 								$c1 = iunserializer($og['commission1']);
 								$l1 = $p->getLevel($m1['openid']);
-								$commission1 += (isset($c1['level' . $l1['id']]) ? $c1['level' . $l1['id']] : $c1['default']);
+
+								if (!empty($c1)) {
+									$commission1 += (isset($c1['level' . $l1['id']]) ? $c1['level' . $l1['id']] : $c1['default']);
+								}
 							}
 						}
 
@@ -457,7 +459,10 @@ class List_EweiShopV2Page extends WebPage
 							else {
 								$c2 = iunserializer($og['commission2']);
 								$l2 = $p->getLevel($m2['openid']);
-								$commission2 += (isset($c2['level' . $l2['id']]) ? $c2['level' . $l2['id']] : $c2['default']);
+
+								if (!empty($c2)) {
+									$commission2 += (isset($c2['level' . $l2['id']]) ? $c2['level' . $l2['id']] : $c2['default']);
+								}
 							}
 						}
 
@@ -468,7 +473,10 @@ class List_EweiShopV2Page extends WebPage
 							else {
 								$c3 = iunserializer($og['commission3']);
 								$l3 = $p->getLevel($m3['openid']);
-								$commission3 += (isset($c3['level' . $l3['id']]) ? $c3['level' . $l3['id']] : $c3['default']);
+
+								if (!empty($c3)) {
+									$commission3 += (isset($c3['level' . $l3['id']]) ? $c3['level' . $l3['id']] : $c3['default']);
+								}
 							}
 						}
 					}
@@ -600,6 +608,7 @@ class List_EweiShopV2Page extends WebPage
 		}
 
 		unset($value);
+		set_time_limit(0);
 
 		if ($_GPC['export'] == 1) {
 			plog('order.op.export', '导出订单');
@@ -621,7 +630,7 @@ class List_EweiShopV2Page extends WebPage
 				array('title' => '商品数量', 'field' => 'goods_total', 'width' => 12),
 				array('title' => '商品单价(折扣前)', 'field' => 'goods_price1', 'width' => 12),
 				array('title' => '商品单价(折扣后)', 'field' => 'goods_price2', 'width' => 12),
-				array('title' => '商品价格(折扣后)', 'field' => 'goods_rprice1', 'width' => 12),
+				array('title' => '商品价格(折扣前)', 'field' => 'goods_rprice1', 'width' => 12),
 				array('title' => '商品价格(折扣后)', 'field' => 'goods_rprice2', 'width' => 12),
 				array('title' => '支付方式', 'field' => 'paytype', 'width' => 12),
 				array('title' => '配送方式', 'field' => 'dispatchname', 'width' => 12),
@@ -643,6 +652,7 @@ class List_EweiShopV2Page extends WebPage
 				array('title' => '快递公司', 'field' => 'expresscom', 'width' => 24),
 				array('title' => '快递单号', 'field' => 'expresssn', 'width' => 24),
 				array('title' => '订单备注', 'field' => 'remark', 'width' => 36),
+				array('title' => '卖家订单备注', 'field' => 'remarksaler', 'width' => 36),
 				array('title' => '核销员', 'field' => 'salerinfo', 'width' => 24),
 				array('title' => '核销门店', 'field' => 'storeinfo', 'width' => 36),
 				array('title' => '订单自定义信息', 'field' => 'order_diyformdata', 'width' => 36),
@@ -660,6 +670,10 @@ class List_EweiShopV2Page extends WebPage
 				}
 
 				$columns[] = array('title' => '导入发货(1为发货)', 'field' => '', 'width' => 24);
+			}
+
+			if ($merch_plugin) {
+				$columns[] = array('title' => '商户名称', 'field' => 'merchname', 'width' => 24);
 			}
 
 			foreach ($list as &$row) {

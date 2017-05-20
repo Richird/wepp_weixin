@@ -52,6 +52,7 @@ if (!class_exists('CommissionModel')) {
 			}
 
 			$agentid = $order['agentid'];
+			$hascommission = false;
 			$goods = pdo_fetchall("select og.id,og.realprice,og.total,g.hasoption,og.goodsid,og.optionid,g.hascommission,g.nocommission, g.commission1_rate,g.commission1_pay,g.commission2_rate,g.commission2_pay,\r\n                  g.commission3_rate,g.commission3_pay,g.commission,og.commissions,og.seckill,og.seckill_taskid,og.seckill_timeid from " . tablename('ewei_shop_order_goods') . '  og ' . ' left join ' . tablename('ewei_shop_goods') . ' g on g.id = og.goodsid' . ' where og.orderid=:orderid and og.uniacid=:uniacid', array(':orderid' => $orderid, ':uniacid' => $_W['uniacid']));
 
 			if (0 < $set['level']) {
@@ -64,6 +65,7 @@ if (!class_exists('CommissionModel')) {
 					}
 
 					if (!empty($seckill_goods)) {
+						$hascommission = true;
 						$cinfo['commission1'] = array('default' => 1 <= $set['level'] ? $seckill_goods['commission1'] * $cinfo['total'] : 0);
 						$cinfo['commission2'] = array('default' => 2 <= $set['level'] ? $seckill_goods['commission2'] * $cinfo['total'] : 0);
 						$cinfo['commission3'] = array('default' => 3 <= $set['level'] ? $seckill_goods['commission3'] * $cinfo['total'] : 0);
@@ -78,6 +80,8 @@ if (!class_exists('CommissionModel')) {
 						$goods_commission = (!empty($cinfo['commission']) ? json_decode($cinfo['commission'], true) : '');
 
 						if (empty($cinfo['nocommission'])) {
+							$hascommission = true;
+
 							if ($cinfo['hascommission'] == 1) {
 								if (empty($goods_commission['type'])) {
 									$cinfo['commission1'] = array('default' => 1 <= $set['level'] ? (0 < $cinfo['commission1_rate'] ? round(($cinfo['commission1_rate'] * $price) / 100, 2) . '' : round($cinfo['commission1_pay'] * $cinfo['total'], 2)) : 0);
@@ -275,6 +279,10 @@ if (!class_exists('CommissionModel')) {
 				}
 
 				unset($cinfo);
+			}
+
+			if (!$hascommission) {
+				pdo_update('ewei_shop_order', array('agentid' => 0), array('id' => $orderid));
 			}
 
 			return $goods;
@@ -916,7 +924,8 @@ if (!class_exists('CommissionModel')) {
 			$member['level3'] = $level3;
 			$member['level3_agentids'] = $level3_agentids;
 			$member['agenttime'] = date('Y-m-d H:i', $member['agenttime']);
-			return $member;
+			$this->getInfo = $member;
+			return $this->getInfo;
 		}
 
 		/**

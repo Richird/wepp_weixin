@@ -694,6 +694,15 @@ class Index_EweiShopV2Page extends MobileLoginPage
 		$expresslist = m('util')->getExpressList($order['express'], $order['expresssn']);
 		include $this->template();
 	}
+
+	public function dispatch()
+	{
+		global $_W;
+		global $_GPC;
+		$merchid = intval($_GPC['merchid']);
+		$list = m('dispatch')->getDispatchList($merchid);
+		include $this->template();
+	}
 }
 
 ?>

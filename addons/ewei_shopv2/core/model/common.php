@@ -177,6 +177,10 @@ class Common_EweiShopV2Model
 			$set['notify_url'] = $_W['siteroot'] . 'addons/ewei_shopv2/payment/alipay/notify.php';
 			$set['return_url'] = mobileUrl('creditshop/log/dispatch_complete', array('openid' => $openid, 'fromwechat' => is_weixin() ? 1 : 0), true);
 		}
+		else if ($type == 22) {
+			$set['notify_url'] = $_W['siteroot'] . 'addons/ewei_shopv2/payment/alipay/notify.php';
+			$set['return_url'] = mobileUrl('threen/register/threen_complete', array('openid' => $openid, 'fromwechat' => is_weixin() ? 1 : 0), true);
+		}
 		else {
 			$set['notify_url'] = $_W['siteroot'] . 'addons/ewei_shopv2/payment/alipay/notify.php';
 			$set['return_url'] = mobileUrl('order/pay_alipay/recharge_complete', array('openid' => $openid, 'fromwechat' => is_weixin() ? 1 : 0), true);
@@ -539,6 +543,10 @@ class Common_EweiShopV2Model
 			return $wOpt;
 		}
 
+		if (IMS_VERSION <= 0.80000000000000004) {
+			$wechat['apikey'] = $wechat['signkey'];
+		}
+
 		$package = array();
 		$package['appid'] = $wechat['appid'];
 		$package['mch_id'] = $wechat['mchid'];
@@ -568,7 +576,7 @@ class Common_EweiShopV2Model
 			$string1 .= $key . '=' . $v . '&';
 		}
 
-		$string1 .= 'key=' . $wechat['signkey'];
+		$string1 .= 'key=' . $wechat['apikey'];
 		$package['sign'] = strtoupper(md5($string1));
 		$dat = array2xml($package);
 		$response = ihttp_request('https://api.mch.weixin.qq.com/pay/unifiedorder', $dat);
@@ -600,7 +608,7 @@ class Common_EweiShopV2Model
 			$string .= $key . '=' . $v . '&';
 		}
 
-		$string .= 'key=' . $wechat['signkey'];
+		$string .= 'key=' . $wechat['apikey'];
 		$wOpt['paySign'] = strtoupper(md5($string));
 		return $wOpt;
 	}

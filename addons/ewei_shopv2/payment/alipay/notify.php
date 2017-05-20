@@ -59,9 +59,12 @@ class aliApy
 		else if ($this->type == '1') {
 			$this->recharge();
 		}
+		else if ($this->type == '2') {
+			$this->cashier();
+		}
 		else {
-			if ($this->type == '2') {
-				$this->cashier();
+			if ($this->type == '6') {
+				$this->threen();
 			}
 		}
 
@@ -129,6 +132,34 @@ class aliApy
 					}
 				}
 			}
+		}
+	}
+
+	/**
+     * 3N营销支付
+     */
+	public function threen()
+	{
+		global $_W;
+
+		if (!$this->publicMethod()) {
+			exit('threen');
+		}
+
+		$logno = trim($this->post['out_trade_no']);
+
+		if (empty($logno)) {
+			exit();
+		}
+
+		$log = pdo_fetch('SELECT * FROM ' . tablename('ewei_shop_threen_log') . ' WHERE `uniacid`=:uniacid and `logno`=:logno limit 1', array(':uniacid' => $_W['uniacid'], ':logno' => $logno));
+
+		if ($this->post['total_fee'] != $log['moneychange']) {
+			exit('fail');
+		}
+
+		if (p('threen')) {
+			p('threen')->payResult($logno, 'alipay', $this->isapp ? true : false);
 		}
 	}
 

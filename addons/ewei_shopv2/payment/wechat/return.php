@@ -28,9 +28,12 @@ if (!empty($ordersn)) {
 	else if ($paytype == 4) {
 		$url = $_W['siteroot'] . '../../app/index.php?i=' . $uniacid . '&c=entry&m=ewei_shopv2&do=mobile&r=sale.coupon.my';
 	}
+	else if ($paytype == 5) {
+		$url = $_W['siteroot'] . '../../app/index.php?i=' . $uniacid . '&c=entry&m=ewei_shopv2&do=mobile&r=groups.pay.complete&ordersn=' . $ordersn . '&type=wechat';
+	}
 	else {
-		if ($paytype == 5) {
-			$url = $_W['siteroot'] . '../../app/index.php?i=' . $uniacid . '&c=entry&m=ewei_shopv2&do=mobile&r=groups.pay.complete&ordersn=' . $ordersn . '&type=wechat';
+		if ($paytype == 6) {
+			$url = $_W['siteroot'] . '../../app/index.php?i=' . $uniacid . '&c=entry&m=ewei_shopv2&do=mobile&r=threen.register.complete&logno=' . $ordersn . '&type=wechat';
 		}
 	}
 }

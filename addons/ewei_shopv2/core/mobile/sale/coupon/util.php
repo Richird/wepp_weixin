@@ -17,14 +17,16 @@ class Util_EweiShopV2Page extends MobilePage
 
 		if ($type == 0) {
 			$list = com_run('coupon::getAvailableCoupons', $type, 0, $merchs, $goods);
+			$list2 = com_run('wxcard::getAvailableWxcards', $type, 0, $merchs, $goods);
 		}
 		else {
 			if ($type == 1) {
 				$list = com_run('coupon::getAvailableCoupons', $type, $money, $merchs);
+				$list2 = array();
 			}
 		}
 
-		show_json(1, array('coupons' => $list));
+		show_json(1, array('coupons' => $list, 'wxcards' => $list2));
 	}
 
 	public function picker()
