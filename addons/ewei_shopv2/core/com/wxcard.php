@@ -1,6 +1,5 @@
 <?php
-//weichengtech
-if (!defined('IN_IA')) {
+if (!(defined('IN_IA'))) {
 	exit('Access Denied');
 }
 
@@ -12,9 +11,11 @@ class Wxcard_EweiShopV2ComModel extends ComModel
 			$url = str_replace('http://', '', $url);
 		}
 
+
 		if (strexists($url, 'https://')) {
 			$url = str_replace('https://', '', $url);
 		}
+
 
 		return $url;
 	}
@@ -27,9 +28,11 @@ class Wxcard_EweiShopV2ComModel extends ComModel
 			$url = str_replace('/addons/ewei_shopv2/', '/', $url);
 		}
 
+
 		if (strexists($url, '/core/mobile/order/')) {
 			$url = str_replace('/core/mobile/order/', '/', $url);
 		}
+
 
 		return $url;
 	}
@@ -43,8 +46,7 @@ class Wxcard_EweiShopV2ComModel extends ComModel
 		$token = $account->fetch_token();
 		$data['buffer'] = '@' . $url;
 		$url = 'https://api.weixin.qq.com/cgi-bin/media/uploadimg?access_token=' . $token;
-		$result = $this->wxHttpsRequest($url, $data);
-		$jsoninfo = json_decode($result, true);
+		$jsoninfo = $this->wxHttpsRequest($url, $data);
 		return $jsoninfo;
 	}
 
@@ -56,8 +58,7 @@ class Wxcard_EweiShopV2ComModel extends ComModel
 		$account = m('common')->getAccount();
 		$token = $account->fetch_token();
 		$url = 'https://api.weixin.qq.com/card/getcolors?access_token=' . $token;
-		$result = $this->wxHttpsRequest($url);
-		$jsoninfo = json_decode($result, true);
+		$jsoninfo = $this->wxHttpsRequest($url);
 		return $jsoninfo;
 	}
 
@@ -81,42 +82,43 @@ class Wxcard_EweiShopV2ComModel extends ComModel
 			$begin_timestamp = $params['begin_timestamp'];
 			$end_timestamp = $params['end_timestamp'];
 		}
-		else {
-			if ($type == 'DATE_TYPE_FIX_TERM') {
-				$fixed_term = (empty($params['fixed_term']) ? 0 : $params['fixed_term']);
-				$fixed_begin_term = (empty($params['fixed_begin_term']) ? 0 : $params['fixed_begin_term']);
-			}
+		 else if ($type == 'DATE_TYPE_FIX_TERM') {
+			$fixed_term = ((empty($params['fixed_term']) ? 0 : $params['fixed_term']));
+			$fixed_begin_term = ((empty($params['fixed_begin_term']) ? 0 : $params['fixed_begin_term']));
 		}
 
-		$quantity = (empty($params['quantity']) ? 100 : $params['quantity']);
-		$use_limit = (empty($params['use_limit']) ? 1 : $params['use_limit']);
-		$get_limit = (empty($params['get_limit']) ? 1 : $params['get_limit']);
+
+		$quantity = ((empty($params['quantity']) ? 100 : $params['quantity']));
+		$use_limit = ((empty($params['use_limit']) ? 1 : $params['use_limit']));
+		$get_limit = ((empty($params['get_limit']) ? 1 : $params['get_limit']));
 		$use_custom_code = 'false';
 		$bind_openid = 'false';
-		$can_share = (empty($params['can_share']) ? 'false' : 'true');
-		$can_give_friend = (empty($params['can_give_friend']) ? 'false' : 'true');
+		$can_share = ((empty($params['can_share']) ? 'false' : 'true'));
+		$can_give_friend = ((empty($params['can_give_friend']) ? 'false' : 'true'));
 		$location_id_list = '';
 		$center_title = $params['center_title'];
 		$center_sub_title = $params['center_sub_title'];
 		$center_url = $this->checkurl($params['center_url']);
 		$setcustom = $params['setcustom'];
 
-		if (!empty($setcustom)) {
+		if (!(empty($setcustom))) {
 			$custom_url_name = $params['custom_url_name'];
 			$custom_url_sub_title = $params['custom_url_sub_title'];
 			$custom_url = $this->checkurl($params['custom_url']);
 		}
 
+
 		$setpromotion = $params['setpromotion'];
 
-		if (!empty($setpromotion)) {
+		if (!(empty($setpromotion))) {
 			$promotion_url_name = $params['promotion_url_name'];
 			$promotion_url_sub_title = $params['promotion_url_sub_title'];
 			$promotion_url = $this->checkurl($params['promotion_url']);
 		}
 
+
 		$source = '';
-		$can_use_with_other_discount = (empty($params['can_use_with_other_discount']) ? 'false' : $params['can_use_with_other_discount']);
+		$can_use_with_other_discount = ((empty($params['can_use_with_other_discount']) ? 'false' : 'true'));
 		$setabstract = $params['setabstract'];
 		$abstract = $params['abstract'];
 		$icon_url_list = $params['icon_url_list'];
@@ -126,13 +128,13 @@ class Wxcard_EweiShopV2ComModel extends ComModel
 		if ($card_type == 'CASH') {
 			$accept_category = $params['accept_category'];
 			$reject_category = $params['reject_category'];
-			$least_cost = (empty($params['least_cost']) ? 0 : $params['least_cost']);
-			$reduce_cost = (empty($params['reduce_cost']) ? 0 : $params['reduce_cost']);
+			$least_cost = ((empty($params['least_cost']) ? 0 : $params['least_cost']));
+			$reduce_cost = ((empty($params['reduce_cost']) ? 0 : $params['reduce_cost']));
 		}
-		else if ($card_type == 'DISCOUNT') {
-			$discount = (empty($params['discount']) ? 0 : $params['discount']);
+		 else if ($card_type == 'DISCOUNT') {
+			$discount = ((empty($params['discount']) ? 0 : $params['discount']));
 		}
-		else {
+		 else {
 			return false;
 		}
 
@@ -143,11 +145,10 @@ class Wxcard_EweiShopV2ComModel extends ComModel
 		if ($card_type == 'CASH') {
 			$jsonData .= ',"cash":{';
 		}
-		else {
-			if ($card_type == 'DISCOUNT') {
-				$jsonData .= ',"discount":{';
-			}
+		 else if ($card_type == 'DISCOUNT') {
+			$jsonData .= ',"discount":{';
 		}
+
 
 		$jsonData .= '"base_info":{';
 		$jsonData .= '"logo_url":"' . $logo_url . '"';
@@ -157,9 +158,10 @@ class Wxcard_EweiShopV2ComModel extends ComModel
 		$jsonData .= ',"color":"' . $color . '"';
 		$jsonData .= ',"notice":"' . $notice . '"';
 
-		if (!empty($service_phone)) {
+		if (!(empty($service_phone))) {
 			$jsonData .= ',"service_phone":"' . $service_phone . '"';
 		}
+
 
 		$jsonData .= ',"description":"' . $description . '"';
 		$jsonData .= ',"date_info":{';
@@ -169,13 +171,12 @@ class Wxcard_EweiShopV2ComModel extends ComModel
 			$jsonData .= ',"begin_timestamp":' . $begin_timestamp;
 			$jsonData .= ',"end_timestamp":' . $end_timestamp;
 		}
-		else {
-			if ($type == 'DATE_TYPE_FIX_TERM') {
-				$jsonData .= '"type":"DATE_TYPE_FIX_TERM"';
-				$jsonData .= ',"fixed_term":' . $fixed_term;
-				$jsonData .= ',"fixed_begin_term":' . $fixed_begin_term;
-			}
+		 else if ($type == 'DATE_TYPE_FIX_TERM') {
+			$jsonData .= '"type":"DATE_TYPE_FIX_TERM"';
+			$jsonData .= ',"fixed_term":' . $fixed_term;
+			$jsonData .= ',"fixed_begin_term":' . $fixed_begin_term;
 		}
+
 
 		$jsonData .= '}';
 		$jsonData .= ',"sku":{"quantity":' . $quantity . '}';
@@ -187,45 +188,50 @@ class Wxcard_EweiShopV2ComModel extends ComModel
 		$jsonData .= ',"center_sub_title":"' . $center_sub_title . '"';
 		$jsonData .= ',"center_url":"' . $center_url . '"';
 
-		if (!empty($setcustom)) {
+		if (!(empty($setcustom))) {
 			$jsonData .= ',"custom_url_name":"' . $custom_url_name . '"';
 			$jsonData .= ',"custom_url":"' . $custom_url . '"';
 			$jsonData .= ',"custom_url_sub_title":"' . $custom_url_sub_title . '"';
 		}
 
-		if (!empty($setpromotion)) {
+
+		if (!(empty($setpromotion))) {
 			$jsonData .= ',"promotion_url_name":"' . $promotion_url_name . '"';
 			$jsonData .= ',"promotion_url_sub_title":"' . $promotion_url_sub_title . '"';
 			$jsonData .= ',"promotion_url":"' . $promotion_url . '"';
 		}
 
+
 		$jsonData .= '}';
 		$jsonData .= ',"advanced_info":{';
 		$jsonData .= '"use_condition":{';
 
-		if (!empty($accept_category)) {
+		if (!(empty($accept_category))) {
 			$jsonData .= '"accept_category":"' . $accept_category . '",';
 		}
 
-		if (!empty($reject_category)) {
+
+		if (!(empty($reject_category))) {
 			$jsonData .= '"reject_category":"' . $reject_category . '",';
 		}
+
 
 		$jsonData .= '"can_use_with_other_discount":' . $can_use_with_other_discount;
 		$jsonData .= '}';
 
-		if (!empty($setabstract)) {
+		if (!(empty($setabstract))) {
 			$jsonData .= ',"abstract":{';
 			$jsonData .= '"abstract":"' . $abstract . '"';
 			$jsonData .= ',"icon_url_list":["' . $icon_url_list . '"]';
-			if (is_array($text_image_list) && !empty($text_image_list)) {
+			if (is_array($text_image_list) && !(empty($text_image_list))) {
 				$jsonData .= ',"text_image_list":[';
 				$listnum = 0;
 
-				foreach ($text_image_list as $text_image) {
+				foreach ($text_image_list as $text_image ) {
 					if (0 < $listnum) {
 						$jsonData .= ',';
 					}
+
 
 					$jsonData .= '{';
 					$jsonData .= '"image_url":"' . $text_image['image_url'] . '"';
@@ -237,8 +243,10 @@ class Wxcard_EweiShopV2ComModel extends ComModel
 				$jsonData .= ']';
 			}
 
+
 			$jsonData .= '}';
 		}
+
 
 		$jsonData .= '}';
 
@@ -246,11 +254,10 @@ class Wxcard_EweiShopV2ComModel extends ComModel
 			$jsonData .= ',"least_cost":"' . $least_cost . '"';
 			$jsonData .= ',"reduce_cost":"' . $reduce_cost . '"';
 		}
-		else {
-			if ($card_type == 'DISCOUNT') {
-				$jsonData .= ',"discount":"' . $discount . '"';
-			}
+		 else if ($card_type == 'DISCOUNT') {
+			$jsonData .= ',"discount":"' . $discount . '"';
 		}
+
 
 		$jsonData .= '}';
 		$jsonData .= '}';
@@ -259,7 +266,6 @@ class Wxcard_EweiShopV2ComModel extends ComModel
 		$token = $account->fetch_token();
 		$url = 'https://api.weixin.qq.com/card/create?access_token=' . $token;
 		$result = $this->wxHttpsRequest($url, $jsonData);
-		$result = json_decode($result, true);
 		return $result;
 	}
 
@@ -279,28 +285,31 @@ class Wxcard_EweiShopV2ComModel extends ComModel
 			$end_timestamp = $params['end_timestamp'];
 		}
 
-		$use_limit = (empty($params['use_limit']) ? 1 : $params['use_limit']);
-		$get_limit = (empty($params['get_limit']) ? 1 : $params['get_limit']);
-		$can_share = (empty($params['can_share']) ? 'false' : 'true');
-		$can_give_friend = (empty($params['can_give_friend']) ? 'false' : 'true');
+
+		$use_limit = ((empty($params['use_limit']) ? 1 : $params['use_limit']));
+		$get_limit = ((empty($params['get_limit']) ? 1 : $params['get_limit']));
+		$can_share = ((empty($params['can_share']) ? 'false' : 'true'));
+		$can_give_friend = ((empty($params['can_give_friend']) ? 'false' : 'true'));
 		$center_title = $params['center_title'];
 		$center_sub_title = $params['center_sub_title'];
 		$center_url = $params['center_url'];
 		$setcustom = $params['setcustom'];
 
-		if (!empty($setcustom)) {
+		if (!(empty($setcustom))) {
 			$custom_url_name = $params['custom_url_name'];
 			$custom_url_sub_title = $params['custom_url_sub_title'];
 			$custom_url = $params['custom_url'];
 		}
 
+
 		$setpromotion = $params['setpromotion'];
 
-		if (!empty($setpromotion)) {
+		if (!(empty($setpromotion))) {
 			$promotion_url_name = $params['promotion_url_name'];
 			$promotion_url_sub_title = $params['promotion_url_sub_title'];
 			$promotion_url = $params['promotion_url'];
 		}
+
 
 		$jsonData = '{';
 		$jsonData .= '"card_id":"' . $card_id . '"';
@@ -308,24 +317,25 @@ class Wxcard_EweiShopV2ComModel extends ComModel
 		if ($card_type == 'CASH') {
 			$jsonData .= ',"cash":{';
 		}
-		else {
-			if ($card_type == 'DISCOUNT') {
-				$jsonData .= ',"discount":{';
-			}
+		 else if ($card_type == 'DISCOUNT') {
+			$jsonData .= ',"discount":{';
 		}
+
 
 		$jsonData .= '"base_info":{';
 
-		if (!empty($logo_url)) {
+		if (!(empty($logo_url))) {
 			$jsonData .= '"logo_url":"' . $logo_url . '",';
 		}
+
 
 		$jsonData .= '"color":"' . $color . '"';
 		$jsonData .= ',"notice":"' . $notice . '"';
 
-		if (!empty($service_phone)) {
+		if (!(empty($service_phone))) {
 			$jsonData .= ',"service_phone":"' . $service_phone . '"';
 		}
+
 
 		$jsonData .= ',"description":"' . $description . '"';
 
@@ -337,6 +347,7 @@ class Wxcard_EweiShopV2ComModel extends ComModel
 			$jsonData .= '}';
 		}
 
+
 		$jsonData .= ',"use_limit":' . $use_limit;
 		$jsonData .= ',"get_limit":' . $get_limit;
 		$jsonData .= ',"can_share":' . $can_share;
@@ -345,17 +356,19 @@ class Wxcard_EweiShopV2ComModel extends ComModel
 		$jsonData .= ',"center_sub_title":"' . $center_sub_title . '"';
 		$jsonData .= ',"center_url":"' . $center_url . '"';
 
-		if (!empty($setcustom)) {
+		if (!(empty($setcustom))) {
 			$jsonData .= ',"custom_url_name":"' . $custom_url_name . '"';
 			$jsonData .= ',"custom_url":"' . $custom_url . '"';
 			$jsonData .= ',"custom_url_sub_title":"' . $custom_url_sub_title . '"';
 		}
 
-		if (!empty($setpromotion)) {
+
+		if (!(empty($setpromotion))) {
 			$jsonData .= ',"promotion_url_name":"' . $promotion_url_name . '"';
 			$jsonData .= ',"promotion_url_sub_title":"' . $promotion_url_sub_title . '"';
 			$jsonData .= ',"promotion_url":"' . $promotion_url . '"';
 		}
+
 
 		$jsonData .= '}';
 		$jsonData .= '}';
@@ -364,7 +377,6 @@ class Wxcard_EweiShopV2ComModel extends ComModel
 		$token = $account->fetch_token();
 		$url = 'https://api.weixin.qq.com/card/update?access_token=' . $token;
 		$result = $this->wxHttpsRequest($url, $jsonData);
-		$result = json_decode($result, true);
 		return $result;
 	}
 
@@ -375,16 +387,16 @@ class Wxcard_EweiShopV2ComModel extends ComModel
 	{
 		$jsonData = '{"offset":"' . $offset . '","count":"' . $count . '"';
 
-		if (!empty($status_list)) {
+		if (!(empty($status_list))) {
 			$jsonData .= ',"' . $status_list . '":["' . $status_list . '"]';
 		}
+
 
 		$jsonData .= '}';
 		$account = m('common')->getAccount();
 		$token = $account->fetch_token();
 		$url = 'https://api.weixin.qq.com/card/batchget?access_token=' . $token;
-		$result = $this->wxHttpsRequest($url, $jsonData);
-		$jsoninfo = json_decode($result, true);
+		$jsoninfo = $this->wxHttpsRequest($url, $jsonData);
 		return $jsoninfo;
 	}
 
@@ -397,7 +409,7 @@ class Wxcard_EweiShopV2ComModel extends ComModel
 		global $_GPC;
 		$id = intval($card_id);
 
-		if (!empty($id)) {
+		if (!(empty($id))) {
 			$sql = 'select id,uniacid, card_id from ' . tablename('ewei_shop_wxcard');
 			$sql .= '  where uniacid=:uniacid and id=:id   limit 1';
 			$wxcard = pdo_fetch($sql, array(':id' => $id, ':uniacid' => $_W['uniacid']));
@@ -405,15 +417,17 @@ class Wxcard_EweiShopV2ComModel extends ComModel
 				return false;
 			}
 
+
 			$card_id = $wxcard['card_id'];
 		}
-		else {
+		 else {
 			$sql = 'select id,uniacid, card_id from ' . tablename('ewei_shop_wxcard');
 			$sql .= '  where uniacid=:uniacid and card_id=:card_id   limit 1';
 			$wxcard = pdo_fetch($sql, array(':card_id' => $card_id, ':uniacid' => $_W['uniacid']));
 			if (empty($wxcard) || empty($wxcard['card_id'])) {
 				return false;
 			}
+
 
 			$card_id = $wxcard['card_id'];
 			$id = $wxcard['id'];
@@ -424,6 +438,7 @@ class Wxcard_EweiShopV2ComModel extends ComModel
 		if (empty($result)) {
 			return false;
 		}
+
 
 		$data = array('quantity' => intval($result['quantity']), 'total_quantity' => intval($result['total_quantity']));
 		pdo_update('ewei_shop_wxcard', $data, array('id' => $id));
@@ -438,8 +453,9 @@ class Wxcard_EweiShopV2ComModel extends ComModel
 		$result = $this->wxCardGetInfo($cardid);
 
 		if (is_wxerror($result)) {
-			return NULL;
+			return;
 		}
+
 
 		$card_type = $result['card']['card_type'];
 		$quantitys = $result['card'][strtolower($card_type)]['base_info']['sku'];
@@ -455,8 +471,7 @@ class Wxcard_EweiShopV2ComModel extends ComModel
 		$account = m('common')->getAccount();
 		$token = $account->fetch_token();
 		$url = 'https://api.weixin.qq.com/card/get?access_token=' . $token;
-		$result = $this->wxHttpsRequest($url, $jsonData);
-		$jsoninfo = json_decode($result, true);
+		$jsoninfo = $this->wxHttpsRequest($url, $jsonData);
 		return $jsoninfo;
 	}
 
@@ -471,7 +486,7 @@ class Wxcard_EweiShopV2ComModel extends ComModel
 		if (empty($type)) {
 			$jsonData .= ',"increase_stock_value":' . $num;
 		}
-		else {
+		 else {
 			$jsonData .= ',"reduce_stock_value":' . $num;
 		}
 
@@ -479,8 +494,7 @@ class Wxcard_EweiShopV2ComModel extends ComModel
 		$account = m('common')->getAccount();
 		$token = $account->fetch_token();
 		$url = 'https://api.weixin.qq.com/card/modifystock?access_token=' . $token;
-		$result = $this->wxHttpsRequest($url, $jsonData);
-		$jsoninfo = json_decode($result, true);
+		$jsoninfo = $this->wxHttpsRequest($url, $jsonData);
 		return $jsoninfo;
 	}
 
@@ -491,16 +505,16 @@ class Wxcard_EweiShopV2ComModel extends ComModel
 	{
 		$jsonData = '{"code":"' . $code . '"';
 
-		if (!empty($card_id)) {
+		if (!(empty($card_id))) {
 			$jsonData .= ',"card_id":"' . $card_id . '"';
 		}
+
 
 		$jsonData .= '}';
 		$account = m('common')->getAccount();
 		$token = $account->fetch_token();
 		$url = 'https://api.weixin.qq.com/card/code/consume?access_token=' . $token;
-		$result = $this->wxHttpsRequest($url, $jsonData);
-		$jsoninfo = json_decode($result, true);
+		$jsoninfo = $this->wxHttpsRequest($url, $jsonData);
 		return $jsoninfo;
 	}
 
@@ -513,8 +527,7 @@ class Wxcard_EweiShopV2ComModel extends ComModel
 		$account = m('common')->getAccount();
 		$token = $account->fetch_token();
 		$url = 'https://api.weixin.qq.com/card/delete?access_token=' . $token;
-		$result = $this->wxHttpsRequest($url, $jsonData);
-		$jsoninfo = json_decode($result, true);
+		$jsoninfo = $this->wxHttpsRequest($url, $jsonData);
 		return $jsoninfo;
 	}
 
@@ -525,16 +538,16 @@ class Wxcard_EweiShopV2ComModel extends ComModel
 	{
 		$jsonData = '{"openid":"' . $openid . '"';
 
-		if (!empty($card_id)) {
+		if (!(empty($card_id))) {
 			$jsonData .= ',"card_id":"' . $card_id . '"';
 		}
+
 
 		$jsonData .= '}';
 		$account = m('common')->getAccount();
 		$token = $account->fetch_token();
 		$url = 'https://api.weixin.qq.com/card/user/getcardlist?access_token=' . $token;
-		$result = $this->wxHttpsRequest($url, $jsonData);
-		$jsoninfo = json_decode($result, true);
+		$jsoninfo = $this->wxHttpsRequest($url, $jsonData);
 		return $jsoninfo;
 	}
 
@@ -549,7 +562,7 @@ class Wxcard_EweiShopV2ComModel extends ComModel
 		if ($check_consume === true) {
 			$jsonData .= ',"check_consume":true';
 		}
-		else {
+		 else {
 			$jsonData .= ',"check_consume":false';
 		}
 
@@ -557,8 +570,7 @@ class Wxcard_EweiShopV2ComModel extends ComModel
 		$account = m('common')->getAccount();
 		$token = $account->fetch_token();
 		$url = 'https://api.weixin.qq.com/card/code/get?access_token=' . $token;
-		$result = $this->wxHttpsRequest($url, $jsonData);
-		$jsoninfo = json_decode($result, true);
+		$jsoninfo = $this->wxHttpsRequest($url, $jsonData);
 		return $jsoninfo;
 	}
 
@@ -574,10 +586,11 @@ class Wxcard_EweiShopV2ComModel extends ComModel
 			return 0;
 		}
 
+
 		$wxcard_list = $ref['card_list'];
 		$card_idlist = array();
 
-		foreach ($wxcard_list as $card) {
+		foreach ($wxcard_list as $card ) {
 			$card_idlist[] = '\'' . $card['card_id'] . '\'';
 		}
 
@@ -588,7 +601,8 @@ class Wxcard_EweiShopV2ComModel extends ComModel
 			return 0;
 		}
 
-		$sql = 'select id,uniacid, card_id,reduce_cost,merchid,limitgoodtype,limitgoodcatetype,limitgoodcateids,limitgoodids  from ' . tablename('ewei_shop_wxcard');
+
+		$sql = 'select id,uniacid, card_id,least_cost,reduce_cost,merchid,limitgoodtype,limitgoodcatetype,limitgoodcateids,limitgoodids  from ' . tablename('ewei_shop_wxcard');
 		$sql .= '  where uniacid=:uniacid and merchid=0 and card_id in (' . $card_id . ')  order by id desc';
 		$cardlist = pdo_fetchall($sql, $param);
 
@@ -596,21 +610,23 @@ class Wxcard_EweiShopV2ComModel extends ComModel
 			return 0;
 		}
 
+
 		$result = array();
 
-		foreach ($wxcard_list as $wxcard) {
-			foreach ($cardlist as $card) {
+		foreach ($wxcard_list as $wxcard ) {
+			foreach ($cardlist as $card ) {
 				if ($wxcard['card_id'] == $card['card_id']) {
 					$card['code'] = $wxcard['code'];
 					$result[] = $card;
 				}
+
 			}
 		}
 
 		$goodlist = array();
 
-		if (!empty($goods_array)) {
-			foreach ($goods_array as $key => $value) {
+		if (!(empty($goods_array))) {
+			foreach ($goods_array as $key => $value ) {
 				$goodparam[':uniacid'] = $_W['uniacid'];
 				$goodparam[':id'] = $value['goodsid'];
 				$sql = 'select id,cates,marketprice,merchid  from ' . tablename('ewei_shop_goods');
@@ -619,11 +635,13 @@ class Wxcard_EweiShopV2ComModel extends ComModel
 				$good['saletotal'] = $value['total'];
 				$good['optionid'] = $value['optionid'];
 
-				if (!empty($good)) {
+				if (!(empty($good))) {
 					$goodlist[] = $good;
 				}
+
 			}
 		}
+
 
 		$result = $this->checkwxcardlimit($result, $goodlist);
 		return count($result);
@@ -641,10 +659,11 @@ class Wxcard_EweiShopV2ComModel extends ComModel
 			return array();
 		}
 
+
 		$wxcard_list = $ref['card_list'];
 		$card_idlist = array();
 
-		foreach ($wxcard_list as $card) {
+		foreach ($wxcard_list as $card ) {
 			$card_idlist[] = '\'' . $card['card_id'] . '\'';
 		}
 
@@ -655,6 +674,7 @@ class Wxcard_EweiShopV2ComModel extends ComModel
 			return array();
 		}
 
+
 		$sql = 'select id,uniacid,card_type,logo_url,title, card_id,least_cost,reduce_cost,discount,merchid,limitgoodtype,limitgoodcatetype,limitgoodcateids,limitgoodids,datetype,end_timestamp,fixed_term  from ' . tablename('ewei_shop_wxcard');
 		$sql .= '  where uniacid=:uniacid and merchid=0 and card_id in (' . $card_id . ')  order by id desc';
 		$cardlist = pdo_fetchall($sql, $param);
@@ -663,21 +683,23 @@ class Wxcard_EweiShopV2ComModel extends ComModel
 			return array();
 		}
 
+
 		$result = array();
 
-		foreach ($wxcard_list as $wxcard) {
-			foreach ($cardlist as $card) {
+		foreach ($wxcard_list as $wxcard ) {
+			foreach ($cardlist as $card ) {
 				if ($wxcard['card_id'] == $card['card_id']) {
 					$card['code'] = $wxcard['code'];
 					$result[] = $card;
 				}
+
 			}
 		}
 
 		$goodlist = array();
 
-		if (!empty($goods_array)) {
-			foreach ($goods_array as $key => $value) {
+		if (!(empty($goods_array))) {
+			foreach ($goods_array as $key => $value ) {
 				$goodparam[':uniacid'] = $_W['uniacid'];
 				$goodparam[':id'] = $value['goodsid'];
 				$sql = 'select id,cates,marketprice,merchid  from ' . tablename('ewei_shop_goods');
@@ -686,31 +708,33 @@ class Wxcard_EweiShopV2ComModel extends ComModel
 				$good['saletotal'] = $value['total'];
 				$good['optionid'] = $value['optionid'];
 
-				if (!empty($good)) {
+				if (!(empty($good))) {
 					$goodlist[] = $good;
 				}
+
 			}
 		}
+
 
 		if ($type == 0) {
 			$list = $this->checkwxcardlimit($result, $goodlist);
 		}
 
+
 		$list = set_medias($list, 'logo_url');
 
-		if (!empty($list)) {
-			foreach ($list as &$row) {
+		if (!(empty($list))) {
+			foreach ($list as &$row ) {
 				$row['logo_url'] = tomedia($row['logo_url']);
 				$row['timestr'] = '永久有效';
 
 				if ($row['datetype'] == 'DATE_TYPE_FIX_TIME_RANGE') {
 					$row['timestr'] = date('Y-m-d H:i', $row['end_timestamp']);
 				}
-				else {
-					if ($row['datetype'] == 'DATE_TYPE_FIX_TERM') {
-						$row['timestr'] = '自生效日后' . $row['fixed_term'] . '天有效';
-					}
+				 else if ($row['datetype'] == 'DATE_TYPE_FIX_TERM') {
+					$row['timestr'] = '自生效日后' . $row['fixed_term'] . '天有效';
 				}
+
 
 				if ($row['card_type'] == 'CASH') {
 					$row['backstr'] = '立减';
@@ -721,23 +745,23 @@ class Wxcard_EweiShopV2ComModel extends ComModel
 					if ($row['reduce_cost'] == '0') {
 						$row['color'] = 'org ';
 					}
-					else {
+					 else {
 						$row['color'] = 'blue';
 					}
 				}
-				else {
-					if ($row['card_type'] == 'DISCOUNT') {
-						$row['backstr'] = '折';
-						$row['css'] = 'discount';
-						$discount = (double) (100 - intval($row['discount'])) / 10;
-						$row['backmoney'] = $discount;
-						$row['color'] = 'red ';
-					}
+				 else if ($row['card_type'] == 'DISCOUNT') {
+					$row['backstr'] = '折';
+					$row['css'] = 'discount';
+					$discount = (double) 100 - (intval($row['discount']) / 10);
+					$row['backmoney'] = $discount;
+					$row['color'] = 'red ';
 				}
+
 			}
 
 			unset($row);
 		}
+
 
 		return $list;
 	}
@@ -746,17 +770,18 @@ class Wxcard_EweiShopV2ComModel extends ComModel
 	{
 		global $_W;
 
-		foreach ($list as $key => $row) {
+		foreach ($list as $key => $row ) {
 			$pass = 0;
-			$reduce_cost = 0;
-			if (($row['limitgoodcatetype'] == 0) && ($row['limitgoodtype'] == 0) && ($row['reduce_cost'] == 0)) {
+			$least_cost = 0;
+			if (($row['limitgoodcatetype'] == 0) && ($row['limitgoodtype'] == 0) && ($row['least_cost'] == 0)) {
 				$pass = 1;
 			}
-			else {
-				foreach ($goodlist as $good) {
+			 else {
+				foreach ($goodlist as $good ) {
 					if ((0 < $row['merchid']) && (0 < $good['merchid']) && ($row['merchid'] != $good['merchid'])) {
 						continue;
 					}
+
 
 					$p = 0;
 					$cates = explode(',', $good['cates']);
@@ -766,13 +791,16 @@ class Wxcard_EweiShopV2ComModel extends ComModel
 						$p = 1;
 					}
 
+
 					if ($row['limitgoodcatetype'] == 1) {
 						$result = array_intersect($cates, $limitcateids);
 
 						if (0 < count($result)) {
 							$p = 1;
 						}
+
 					}
+
 
 					if ($row['limitgoodtype'] == 1) {
 						$isin = in_array($good['id'], $limitgoodids);
@@ -780,13 +808,16 @@ class Wxcard_EweiShopV2ComModel extends ComModel
 						if ($isin) {
 							$p = 1;
 						}
+
 					}
+
 
 					if ($p == 1) {
 						$pass = 1;
 					}
 
-					if ((0 < $row['reduce_cost']) && ($p == 1)) {
+
+					if ((0 < $row['least_cost']) && ($p == 1)) {
 						if (0 < $good['optionid']) {
 							$optionparam[':uniacid'] = $_W['uniacid'];
 							$optionparam[':id'] = $good['optionid'];
@@ -794,24 +825,28 @@ class Wxcard_EweiShopV2ComModel extends ComModel
 							$sql .= ' where uniacid=:uniacid and id =:id order by id desc LIMIT 1 ';
 							$option = pdo_fetch($sql, $optionparam);
 
-							if (!empty($option)) {
-								$reduce_cost += (double) $option['marketprice'] * $good['saletotal'];
+							if (!(empty($option))) {
+								$least_cost += (double) $option['marketprice'] * $good['saletotal'];
 							}
+
 						}
-						else {
-							$reduce_cost += (double) $good['marketprice'] * $good['saletotal'];
+						 else {
+							$least_cost += (double) $good['marketprice'] * $good['saletotal'];
 						}
 					}
+
 				}
 
-				if ((0 < $row['reduce_cost']) && (($reduce_cost * 100) < $row['reduce_cost'])) {
+				if ((0 < $row['least_cost']) && (($least_cost * 100) < $row['least_cost'])) {
 					$pass = 0;
 				}
+
 			}
 
 			if ($pass == 0) {
 				unset($list[$key]);
 			}
+
 		}
 
 		return array_values($list);
@@ -830,8 +865,7 @@ class Wxcard_EweiShopV2ComModel extends ComModel
 		$account = m('common')->getAccount();
 		$token = $account->fetch_token();
 		$url = 'https://api.weixin.qq.com/card/qrcode/create?access_token=' . $token;
-		$result = $this->wxHttpsRequest($url, $jsonData);
-		$jsoninfo = json_decode($result, true);
+		$jsoninfo = $this->wxHttpsRequest($url, $jsonData);
 		return $jsoninfo;
 	}
 
@@ -844,7 +878,7 @@ class Wxcard_EweiShopV2ComModel extends ComModel
 		$token = $account->fetch_token();
 		$url = 'https://api.weixin.qq.com/cgi-bin/ticket/getticket?type=jsapi&access_token=' . $token;
 		$result = $this->wxHttpsRequest($url);
-		$jsoninfo = json_decode($result, true);
+		$jsoninfo = @json_decode($result, true);
 		$ticket = $jsoninfo['ticket'];
 		return $ticket;
 	}
@@ -874,12 +908,12 @@ class Wxcard_EweiShopV2ComModel extends ComModel
 	public function wxCardAllPackage($cardIdArray = array(), $openid = '')
 	{
 		$reArrays = array();
-		if (!empty($cardIdArray) && (is_array($cardIdArray) || is_object($cardIdArray))) {
-			foreach ($cardIdArray as $value) {
+		if (!(empty($cardIdArray)) && (is_array($cardIdArray) || is_object($cardIdArray))) {
+			foreach ($cardIdArray as $value ) {
 				$reArrays[] = $this->wxCardPackage($value, $openid);
 			}
 		}
-		else {
+		 else {
 			$reArrays[] = $this->wxCardPackage($cardIdArray, $openid);
 		}
 
@@ -891,20 +925,8 @@ class Wxcard_EweiShopV2ComModel extends ComModel
      */
 	public function wxHttpsRequest($url, $data = NULL)
 	{
-		$curl = curl_init();
-		curl_setopt($curl, CURLOPT_URL, $url);
-		curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
-		curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, false);
-
-		if (!empty($data)) {
-			curl_setopt($curl, CURLOPT_POST, 1);
-			curl_setopt($curl, CURLOPT_POSTFIELDS, $data);
-		}
-
-		curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
-		$output = curl_exec($curl);
-		curl_close($curl);
-		return $output;
+		$result = ihttp_request($url, $data);
+		return @json_decode($result['content'], true);
 	}
 
 	/**
@@ -912,10 +934,11 @@ class Wxcard_EweiShopV2ComModel extends ComModel
      */
 	public function wxSetParam($parameters)
 	{
-		if (is_array($parameters) && !empty($parameters)) {
+		if (is_array($parameters) && !(empty($parameters))) {
 			$this->parameters = $parameters;
 			return $this->parameters;
 		}
+
 
 		return array();
 	}
@@ -929,22 +952,26 @@ class Wxcard_EweiShopV2ComModel extends ComModel
 			$parameters = $this->parameters;
 		}
 
+
 		$restr = '';
 		ksort($parameters);
 
-		foreach ($parameters as $k => $v) {
+		foreach ($parameters as $k => $v ) {
 			if ((NULL != $v) && ('null' != $v) && ('sign' != $k)) {
 				if ($urlencode) {
 					$v = urlencode($v);
 				}
 
+
 				$restr .= $k . '=' . $v . '&';
 			}
+
 		}
 
 		if (0 < strlen($restr)) {
 			$restr = substr($restr, 0, strlen($restr) - 1);
 		}
+
 
 		return $restr;
 	}
@@ -959,6 +986,7 @@ class Wxcard_EweiShopV2ComModel extends ComModel
 				throw new Exception('签名内容不能为空');
 			}
 
+
 			return sha1($content);
 		}
 		catch (Exception $e) {
@@ -969,9 +997,10 @@ class Wxcard_EweiShopV2ComModel extends ComModel
 	public function getWxTicket()
 	{
 		$cardTicket = m('cache')->getArray('wx_card_ticket');
-		if (!empty($cardTicket) && !empty($cardTicket['ticket']) && (TIMESTAMP < $cardTicket['expire'])) {
+		if (!(empty($cardTicket)) && !(empty($cardTicket['ticket'])) && (TIMESTAMP < $cardTicket['expire'])) {
 			return $cardTicket['ticket'];
 		}
+
 
 		$account = m('common')->getAccount();
 		$token = $account->fetch_token();
@@ -983,10 +1012,12 @@ class Wxcard_EweiShopV2ComModel extends ComModel
 			return error(-1, '调用接口获取微信公众号 jsapi_ticket 失败, 错误信息: ' . $content['message']);
 		}
 
+
 		$result = @json_decode($content['content'], true);
 		if (empty($result) || (intval($result['errcode']) != 0) || ($result['errmsg'] != 'ok')) {
 			return error(-1, '获取微信公众号 jsapi_ticket 结果错误, 错误信息: ' . $result['errmsg']);
 		}
+
 
 		$cardTicket['ticket'] = $result['ticket'];
 		$cardTicket['expire'] = (TIMESTAMP + $result['expires_in']) - 200;
@@ -1005,5 +1036,6 @@ class Wxcard_EweiShopV2ComModel extends ComModel
 		return $signature;
 	}
 }
+
 
 ?>
