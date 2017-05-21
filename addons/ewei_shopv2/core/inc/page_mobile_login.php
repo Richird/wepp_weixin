@@ -1,6 +1,5 @@
 <?php
-//weichengtech
-if (!defined('IN_IA')) {
+if (!(defined('IN_IA'))) {
 	exit('Access Denied');
 }
 
@@ -13,5 +12,6 @@ class MobileLoginPage extends MobilePage
 		parent::__construct();
 	}
 }
+
 
 ?>

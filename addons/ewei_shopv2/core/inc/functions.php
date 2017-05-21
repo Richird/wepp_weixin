@@ -180,7 +180,7 @@ if (!(function_exists('set_medias')))
 	{
 		if (empty($list)) 
 		{
-			return array();
+			return '';
 		}
 		if (empty($fields)) 
 		{
@@ -502,258 +502,229 @@ if (!(function_exists('plog')))
 		com_run('perm::log', $type, $op);
 	}
 }
-if (!function_exists('tpl_selector')) {
-    function tpl_selector($name, $options = array())
-    {
-
-        $options['multi'] = intval($options['multi']);
-
-        $options['buttontext'] = isset($options['buttontext']) ? $options['buttontext'] : '请选择';
-
-        $options['items'] = isset($options['items']) && $options['items'] ? $options['items'] : array();
-
-
-        $options['readonly'] = isset($options['readonly']) ? $options['readonly'] : true;
-        $options['callback'] = isset($options['callback']) ? $options['callback'] : '';
-        $options['key'] = isset($options['key']) ? $options['key'] : 'id';
-        $options['text'] = isset($options['text']) ? $options['text'] : 'title';
-        $options['thumb'] = isset($options['thumb']) ? $options['thumb'] : 'thumb';
-        $options['preview'] = isset($options['preview']) ? $options['preview'] : true;
-        $options['type'] = isset($options['type']) ? $options['type'] : 'image';
-        $options['input'] = isset($options['input']) ? $options['input'] : true;
-        $options['required'] = isset($options['required']) ? $options['required'] : false;
-        $options['nokeywords'] = isset($options['nokeywords']) ? $options['nokeywords'] : 0;
-        $options['placeholder'] = isset($options['placeholder']) ? $options['placeholder'] : '请输入关键词';
-        $options['autosearch'] = isset($options['autosearch']) ? $options['autosearch'] : 0;
-        if (empty($options['items'])) {
-            $options['items'] = array();
-        } else if (!is_array2($options['items'])) {
-            $options['items'] = array($options['items']);
-        }
-        $options['name'] = $name;
-
-        $titles = '';
-        foreach ($options['items'] as $item) {
-            $titles .= $item[$options['text']];
-            if (count($options['items']) > 1) {
-                $titles .= "; ";
-            }
-        }
-
-        $options['value'] = isset($options['value']) ? $options['value'] : $titles;
-
-        $readonly = $options['readonly'] ? 'readonly' : '';
-        $required = $options['required'] ? ' data-rule-required="true"' : '';
-        $callback = !empty($options['callback']) ? ", {$options['callback']}" : '';
-        $id = $options['multi'] ? "{$name}[]" : $name;
-        $html = "<div id='{$name}_selector' class='selector' 
-                     data-type=\"{$options['type']}\"
-                     data-key=\"{$options['key']}\"
-                     data-text=\"{$options['text']}\"
-                     data-thumb=\"{$options['thumb']}\"
-                     data-multi=\"{$options['multi']}\"
-                     data-callback=\"{$options['callback']}\"
-                     data-url=\"{$options['url']}\",
-                     data-nokeywords=\"{$options['nokeywords']}\"
-                  data-autosearch=\"{$options['autosearch']}\"
-
-                 >";
-        if ($options['input']) {
-            $html .= "<div class='input-group'>"
-                . "<input type='text' id='{$name}_text' name='{$name}_text'  value='{$options['value']}' class='form-control text'  {$readonly}  {$required}/>"
-                . "<div class='input-group-btn'>";
-        }
-        $html .= "<button class='btn btn-primary' type='button' onclick='biz.selector.select(" . json_encode($options) . ");'>{$options['buttontext']}</button>";
-        if ($options['input']) {
-            $html .= "</div>";
-            $html .= "</div>";
-        }
-
-
-        $show = $options['preview'] ? '' : " style='display:none'";
-        if ($options['type'] == 'image') {
-            $html .= "<div class='input-group multi-img-details container' $show>";
-        } else {
-            $html .= "<div class='input-group multi-audio-details container' $show>";
-        }
-
-        foreach ($options['items'] as $item) {
-            if ($options['type'] == 'image') {
-                $html .= "<div class='multi-item' data-{$options['key']}='{$item[$options['key']]}' data-name='{$name}'>
-                                      <img class='img-responsive img-thumbnail' src='" . tomedia($item[$options['thumb']]) . "'>
-                                      <div class='img-nickname'>{$item[$options['text']]}</div>
-                                     <input type='hidden' value='{$item[$options['key']]}' name='{$id}'>
-                                     <em onclick='biz.selector.remove(this,\"{$name}\")'  class='close'>×</em>
-                            <div style='clear:both;'></div>
-                         </div>";
-            } else {
-                $html .= "<div class='multi-audio-item ' data-{$options['key']}='{$item[$options['key']]}' >
-                       <div class='input-group'>
-                       <input type='text' class='form-control img-textname' readonly='' value='{$item[$options['text']]}'>
-                       <input type='hidden'  value='{$item[$options['key']]}' name='{$id}'> 
-                       <div class='input-group-btn'><button class='btn btn-default' onclick='biz.selector.remove(this,\"{$name}\")' type='button'><i class='fa fa-remove'></i></button>
-                       </div></div></div>";
-            }
-        }
-        $html .= "</div></div>";
-
-        return $html;
-    }
+if (!(function_exists('tpl_selector'))) 
+{
+	function tpl_selector($name, $options = array()) 
+	{
+		$options['multi'] = intval($options['multi']);
+		$options['buttontext'] = ((isset($options['buttontext']) ? $options['buttontext'] : '请选择'));
+		$options['items'] = ((isset($options['items']) && $options['items'] ? $options['items'] : array()));
+		$options['readonly'] = ((isset($options['readonly']) ? $options['readonly'] : true));
+		$options['callback'] = ((isset($options['callback']) ? $options['callback'] : ''));
+		$options['key'] = ((isset($options['key']) ? $options['key'] : 'id'));
+		$options['text'] = ((isset($options['text']) ? $options['text'] : 'title'));
+		$options['thumb'] = ((isset($options['thumb']) ? $options['thumb'] : 'thumb'));
+		$options['preview'] = ((isset($options['preview']) ? $options['preview'] : true));
+		$options['type'] = ((isset($options['type']) ? $options['type'] : 'image'));
+		$options['input'] = ((isset($options['input']) ? $options['input'] : true));
+		$options['required'] = ((isset($options['required']) ? $options['required'] : false));
+		$options['nokeywords'] = ((isset($options['nokeywords']) ? $options['nokeywords'] : 0));
+		$options['placeholder'] = ((isset($options['placeholder']) ? $options['placeholder'] : '请输入关键词'));
+		$options['autosearch'] = ((isset($options['autosearch']) ? $options['autosearch'] : 0));
+		if (empty($options['items'])) 
+		{
+			$options['items'] = array();
+		}
+		else if (!(is_array2($options['items']))) 
+		{
+			$options['items'] = array($options['items']);
+		}
+		$options['name'] = $name;
+		$titles = '';
+		foreach ($options['items'] as $item ) 
+		{
+			$titles .= $item[$options['text']];
+			if (1 < count($options['items'])) 
+			{
+				$titles .= '; ';
+			}
+		}
+		$options['value'] = ((isset($options['value']) ? $options['value'] : $titles));
+		$readonly = (($options['readonly'] ? 'readonly' : ''));
+		$required = (($options['required'] ? ' data-rule-required="true"' : ''));
+		$callback = ((!(empty($options['callback'])) ? ', ' . $options['callback'] : ''));
+		$id = (($options['multi'] ? $name . '[]' : $name));
+		$html = '<div id=\'' . $name . '_selector\' class=\'selector\' ' . "\r\n" . '                     data-type="' . $options['type'] . '"' . "\r\n" . '                     data-key="' . $options['key'] . '"' . "\r\n" . '                     data-text="' . $options['text'] . '"' . "\r\n" . '                     data-thumb="' . $options['thumb'] . '"' . "\r\n" . '                     data-multi="' . $options['multi'] . '"' . "\r\n" . '                     data-callback="' . $options['callback'] . '"' . "\r\n" . '                     data-url="' . $options['url'] . '",' . "\r\n" . '                     data-nokeywords="' . $options['nokeywords'] . '"' . "\r\n" . '                  data-autosearch="' . $options['autosearch'] . '"' . "\r\n\r\n" . '                 >';
+		if ($options['input']) 
+		{
+			$html .= '<div class=\'input-group\'>' . '<input type=\'text\' id=\'' . $name . '_text\' name=\'' . $name . '_text\'  value=\'' . $options['value'] . '\' class=\'form-control text\'  ' . $readonly . '  ' . $required . '/>' . '<div class=\'input-group-btn\'>';
+		}
+		$html .= '<button class=\'btn btn-primary\' type=\'button\' onclick=\'biz.selector.select(' . json_encode($options) . ');\'>' . $options['buttontext'] . '</button>';
+		if ($options['input']) 
+		{
+			$html .= '</div>';
+			$html .= '</div>';
+		}
+		$show = (($options['preview'] ? '' : ' style=\'display:none\''));
+		if ($options['type'] == 'image') 
+		{
+			$html .= '<div class=\'input-group multi-img-details container\' ' . $show . '>';
+		}
+		else 
+		{
+			$html .= '<div class=\'input-group multi-audio-details container\' ' . $show . '>';
+		}
+		foreach ($options['items'] as $item ) 
+		{
+			if ($options['type'] == 'image') 
+			{
+				$html .= '<div class=\'multi-item\' data-' . $options['key'] . '=\'' . $item[$options['key']] . '\' data-name=\'' . $name . '\'>' . "\r\n" . '                                      <img class=\'img-responsive img-thumbnail\' src=\'' . tomedia($item[$options['thumb']]) . '\'>' . "\r\n" . '                                      <div class=\'img-nickname\'>' . $item[$options['text']] . '</div>' . "\r\n" . '                                     <input type=\'hidden\' value=\'' . $item[$options['key']] . '\' name=\'' . $id . '\'>' . "\r\n" . '                                     <em onclick=\'biz.selector.remove(this,"' . $name . '")\'  class=\'close\'>×</em>' . "\r\n" . '                            <div style=\'clear:both;\'></div>' . "\r\n" . '                         </div>';
+			}
+			else 
+			{
+				$html .= '<div class=\'multi-audio-item \' data-' . $options['key'] . '=\'' . $item[$options['key']] . '\' >' . "\r\n" . '                       <div class=\'input-group\'>' . "\r\n" . '                       <input type=\'text\' class=\'form-control img-textname\' readonly=\'\' value=\'' . $item[$options['text']] . '\'>' . "\r\n" . '                       <input type=\'hidden\'  value=\'' . $item[$options['key']] . '\' name=\'' . $id . '\'> ' . "\r\n" . '                       <div class=\'input-group-btn\'><button class=\'btn btn-default\' onclick=\'biz.selector.remove(this,"' . $name . '")\' type=\'button\'><i class=\'fa fa-remove\'></i></button>' . "\r\n" . '                       </div></div></div>';
+			}
+		}
+		$html .= '</div></div>';
+		return $html;
+	}
 }
-//商品搜索新控件
-if (!function_exists('tpl_selector_new')) {
-    function tpl_selector_new($name, $options = array())
-    {
-        $options['multi'] = intval($options['multi']);
-        $options['buttontext'] = isset($options['buttontext']) ? $options['buttontext'] : '请选择';
-        $options['items'] = isset($options['items']) && $options['items'] ? $options['items'] : array();
-        $options['readonly'] = isset($options['readonly']) ? $options['readonly'] : true;
-        $options['callback'] = isset($options['callback']) ? $options['callback'] : '';
-        $options['key'] = isset($options['key']) ? $options['key'] : 'id';
-        $options['text'] = isset($options['text']) ? $options['text'] : 'title';
-        $options['thumb'] = isset($options['thumb']) ? $options['thumb'] : 'thumb';
-        $options['preview'] = isset($options['preview']) ? $options['preview'] : true;
-        $options['type'] = isset($options['type']) ? $options['type'] : 'image';
-        $options['input'] = isset($options['input']) ? $options['input'] : true;
-        $options['required'] = isset($options['required']) ? $options['required'] : false;
-        $options['nokeywords'] = isset($options['nokeywords']) ? $options['nokeywords'] : 0;
-        $options['placeholder'] = isset($options['placeholder']) ? $options['placeholder'] : '请输入关键词';
-        $options['autosearch'] = isset($options['autosearch']) ? $options['autosearch'] : 0;
-        $options['optionurl'] = isset($options['optionurl']) ? $options['optionurl'] : '';
-        $options['selectorid'] = isset($options['selectorid']) ? $options['selectorid'] : '';
-        if (empty($options['items'])) {
-            $options['items'] = array();
-        } else if (!is_array2($options['items'])) {
-            $options['items'] = array($options['items']);
-        }
-        $options['name'] = $name;
+if (!(function_exists('tpl_selector_new'))) 
+{
+	function tpl_selector_new($name, $options = array()) 
+	{
+		$options['multi'] = intval($options['multi']);
+		$options['buttontext'] = ((isset($options['buttontext']) ? $options['buttontext'] : '请选择'));
+		$options['items'] = ((isset($options['items']) && $options['items'] ? $options['items'] : array()));
+		$options['readonly'] = ((isset($options['readonly']) ? $options['readonly'] : true));
+		$options['callback'] = ((isset($options['callback']) ? $options['callback'] : ''));
+		$options['key'] = ((isset($options['key']) ? $options['key'] : 'id'));
+		$options['text'] = ((isset($options['text']) ? $options['text'] : 'title'));
+		$options['thumb'] = ((isset($options['thumb']) ? $options['thumb'] : 'thumb'));
+		$options['preview'] = ((isset($options['preview']) ? $options['preview'] : true));
+		$options['type'] = ((isset($options['type']) ? $options['type'] : 'image'));
+		$options['input'] = ((isset($options['input']) ? $options['input'] : true));
+		$options['required'] = ((isset($options['required']) ? $options['required'] : false));
+		$options['nokeywords'] = ((isset($options['nokeywords']) ? $options['nokeywords'] : 0));
+		$options['placeholder'] = ((isset($options['placeholder']) ? $options['placeholder'] : '请输入关键词'));
+		$options['autosearch'] = ((isset($options['autosearch']) ? $options['autosearch'] : 0));
+		$options['optionurl'] = ((isset($options['optionurl']) ? $options['optionurl'] : ''));
+		$options['selectorid'] = ((isset($options['selectorid']) ? $options['selectorid'] : ''));
+		if (empty($options['items'])) 
+		{
+			$options['items'] = array();
+		}
+		else if (!(is_array2($options['items']))) 
+		{
+			$options['items'] = array($options['items']);
+		}
+		$options['name'] = $name;
+		$titles = '';
+		foreach ($options['items'] as $item ) 
+		{
+			$titles .= $item[$options['text']];
+			if (1 < count($options['items'])) 
+			{
+				$titles .= '; ';
+			}
+		}
+		$options['value'] = ((isset($options['value']) ? $options['value'] : $titles));
+		$readonly = (($options['readonly'] ? 'readonly' : ''));
+		$required = (($options['required'] ? ' data-rule-required="true"' : ''));
+		$callback = ((!(empty($options['callback'])) ? ', ' . $options['callback'] : ''));
+		$id = (($options['multi'] ? $name . '[]' : $name));
+		$html = '<div id=\'' . $name . '_selector\' class=\'selector\'' . "\r\n" . '                     data-type="' . $options['type'] . '"' . "\r\n" . '                     data-key="' . $options['key'] . '"' . "\r\n" . '                     data-text="' . $options['text'] . '"' . "\r\n" . '                     data-thumb="' . $options['thumb'] . '"' . "\r\n" . '                     data-multi="' . $options['multi'] . '"' . "\r\n" . '                     data-callback="' . $options['callback'] . '"' . "\r\n" . '                     data-url="' . $options['url'] . '",' . "\r\n" . '                     data-nokeywords="' . $options['nokeywords'] . '" ' . "\r\n" . '                     data-autosearch="' . $options['autosearch'] . '"' . "\r\n" . '                     data-optionurl="' . $options['optionurl'] . '"' . "\r\n" . '                     data-selectorid="' . $options['selectorid'] . '"' . "\r\n" . ' ' . "\r\n" . '                 >';
+		if ($options['input']) 
+		{
+			$html .= '<div class=\'input-group\'>' . '<input type=\'text\' id=\'' . $name . '_text\' name=\'' . $name . '_text\'  value=\'' . $options['value'] . '\' class=\'form-control text\'  ' . $readonly . '  ' . $required . '/>' . '<div class=\'input-group-btn\'>';
+		}
+		$html .= '<button class=\'btn btn-primary\' type=\'button\' onclick=\'biz.selector_new.select(' . json_encode($options) . ');\'>' . $options['buttontext'] . '</button>';
+		if ($options['input']) 
+		{
+			$html .= '</div>';
+			$html .= '</div>';
+		}
+		$show = (($options['preview'] ? '' : ' style=\'display:none\''));
+		if ($options['type'] == 'image') 
+		{
+			$html .= '<div class=\'input-group multi-img-details container\' ' . $show . '>';
+		}
+		else    if ($options['type'] == 'product') 
+		{
+			$html .= '<div class=\'input-group multi-audio-details container\' ' . $show . '>' . "\r\n" . '<table class=\'table\' style=\'width:600px;\'>' . "\r\n" . '                    <thead>' . "\r\n" . '                        <tr>' . "\r\n" . '                            <th style=\'width:80px;\'>商品名称</th>' . "\r\n" . '                            <th style=\'width:220px;\'></th>' . "\r\n" . '                            <th>价格/分销佣金</th>' . "\r\n" . '                            <th style=\'width:50px;\'>操作</th>' . "\r\n" . '                        </tr>' . "\r\n" . '                    </thead>' . "\r\n" . '                    <tbody id=\'param-items' . $options['selectorid'] . '\' class=\'ui-sortable\'>';
+		}
+		else if ($options['type'] == 'fullback') {
+		$html .= '<div class=\'input-group multi-audio-details container\' ' . $show . '>' . "\r\n" . '<table class=\'table\' style=\'width:600px;\'>' . "\r\n" . '                    <tbody id=\'param-items' . $options['selectorid'] . '\' class=\'ui-sortable\'>';
+	}
+	 else {
+		$html .= '<div class=\'input-group multi-img-details container\' ' . $show . '>';
+	}
+		foreach ($options['items'] as $item ) 
+		{
+			if ($options['type'] == 'image') 
+			{
+				$html .= '<div class=\'multi-item\' data-' . $options['key'] . '=\'' . $item[$options['key']] . '\' data-name=\'' . $name . '\'>' . "\r\n" . '                                      <img class=\'img-responsive img-thumbnail\' src=\'' . tomedia($item[$options['thumb']]) . '\'>' . "\r\n" . '                                      <div class=\'img-nickname\'>' . $item[$options['text']] . '</div>' . "\r\n" . '                                     <input type=\'hidden\' value=\'' . $item[$options['key']] . '\' name=\'' . $id . '\'>' . "\r\n" . '                                     <em onclick=\'biz.selector_new.remove(this,"' . $name . '")\'  class=\'close\'>×</em>' . "\r\n" . '                         </div>';
+			}
+			else if ($options['type'] == 'product') 
+			{
+				if ($item['optiontitle']) 
+				{
+					$optiontitle = $item['optiontitle'][0]['title'] . '...';
+				}
+				else 
+				{
+					$optiontitle = '&yen;' . $item['packageprice'];
+				}
+				$html .= "\r\n" . '                    <tr class=\'multi-product-item\' data-' . $options['key'] . '=\'' . $item['goodsid'] . '\' >' . "\r\n" . '                        <input type=\'hidden\' class=\'form-control img-textname\' readonly=\'\' value=\'' . $item[$options['text']] . '\'>' . "\r\n" . '                       <input type=\'hidden\'  value=\'' . $item['goodsid'] . '\' name=\'' . $id . '\'>' . "\r\n" . '                        <td style=\'width:80px;\'>' . "\r\n" . '                            <img src=\'' . tomedia($item[$options['thumb']]) . '\' style=\'width:70px;border:1px solid #ccc;padding:1px\'>' . "\r\n" . '                        </td>' . "\r\n" . '                        <td style=\'width:220px;\'>' . $item[$options['text']] . '</td>' . "\r\n" . '                        <td>';
+				$optionurl = ((empty($options['optionurl']) ? 'sale/package/hasoption' : str_replace('.', '/', $options['optionurl'])));
+				if ($item['optiontitle']) 
+				{
+					$html .= '<a class=\'btn btn-default btn-sm\' data-toggle=\'ajaxModal\' href=\'' . webUrl($optionurl, array('goodsid' => $item['goodsid'], 'pid' => $item['pid'], 'selectorid' => $options['selectorid'])) . '\' id=\'' . $options['selectorid'] . 'optiontitle' . $item['goodsid'] . '\'>' . $optiontitle . '</a>' . "\r\n" . '                            <input type=\'hidden\' id=\'' . $options['selectorid'] . 'packagegoods' . $item['goodsid'] . '\' value=\'' . $item['option'] . '\' name=\'' . $options['selectorid'] . 'packagegoods[' . $item['goodsid'] . ']\'>';
+					foreach ($item['optiontitle'] as $option ) 
+					{
+						$total = ((isset($option['total']) ? ',' . $option['total'] : ''));
+						$maxbuy = ((isset($option['maxbuy']) ? ',' . $option['maxbuy'] : ''));
+						$totalmaxbuy = ((isset($option['totalmaxbuy']) ? ',' . $option['totalmaxbuy'] : ''));
+						$html .= '<input type=\'hidden\' value=\'' . $option['packageprice'] . ',' . $option['commission1'] . ',' . $option['commission2'] . ',' . $option['commission3'] . $total . $maxbuy . $totalmaxbuy . '\'' . "\r\n" . '                        name=\'' . $options['selectorid'] . 'packagegoodsoption' . $option['optionid'] . '\' >';
+					}
+				}
+				else 
+				{
+					$total = ((isset($item['total']) ? ',' . $item['total'] : ''));
+					$maxbuy = ((isset($item['maxbuy']) ? ',' . $item['maxbuy'] : ''));
+					$totalmaxbuy = ((isset($item['totalmaxbuy']) ? ',' . $item['totalmaxbuy'] : ''));
+					$html .= '<a class=\'btn btn-default btn-sm\' data-toggle=\'ajaxModal\' href=\'' . webUrl($optionurl, array('goodsid' => $item['goodsid'], 'pid' => $item['pid'], 'selectorid' => $options['selectorid'])) . '\' id=\'' . $options['selectorid'] . 'optiontitle' . $item['goodsid'] . '\'>&yen;' . $item['packageprice'] . '</a>' . "\r\n" . '                            <input type=\'hidden\' id=\'' . $options['selectorid'] . 'packagegoods' . $item['goodsid'] . '\' value=\'\' name=\'' . $options['selectorid'] . 'packagegoods[' . $item['goodsid'] . ']\'>' . "\r\n" . '                    <input type=\'hidden\' value=\'' . $item['packageprice'] . ',' . $item['commission1'] . ',' . $item['commission2'] . ',' . $item['commission3'] . $total . $maxbuy . $totalmaxbuy . '\' name=\'' . $options['selectorid'] . 'packgoods' . $item['goodsid'] . '\' >';
+				}
+				$html .= "\r\n" . '                        </td>' . "\r\n" . '                        <td><a href=\'javascript:void(0);\' class=\'btn btn-default btn-sm\' onclick=\'biz.selector_new.remove(this,"' . $name . '")\' title=\'删除\'>' . "\r\n" . '                        <i class=\'fa fa-times\'></i></a></td>' . "\r\n" . '                    </tr>';
+}
+		 else if ($options['type'] == 'fullback') {
+			$html .= "\r\n" . '                    <tr class=\'multi-product-item\' data-' . $options['key'] . '=\'' . $item['goodsid'] . '\' >' . "\r\n" . '                        <input type=\'hidden\' class=\'form-control img-textname\' readonly=\'\' value=\'' . $item[$options['text']] . '\'>' . "\r\n" . '                       <input type=\'hidden\'  value=\'' . $item['goodsid'] . '\' name=\'' . $id . '\'>' . "\r\n" . '                        <td style=\'width:80px;\'>' . "\r\n" . '                            <img src=\'' . tomedia($item[$options['thumb']]) . '\' style=\'width:70px;border:1px solid #ccc;padding:1px\'>' . "\n" . '                        </td>' . "\n" . '                        <td style=\'width:220px;\'>' . $item[$options['text']] . '</td>' . "\n" . '                        <td>';
+			$optionurl = ((empty($options['optionurl']) ? 'sale/fullback/hasoption' : str_replace('.', '/', $options['optionurl'])));
 
-        $titles = '';
-        foreach ($options['items'] as $item) {
-            $titles .= $item[$options['text']];
-            if (count($options['items']) > 1) {
-                $titles .= "; ";
-            }
-        }
+			if (0 < $item['hasoption']) {
+				if ($item['type'] == 0) {
+					$opcontent = '&yen;' . $item['minallfullbackallprice'] . ' ~ &yen;' . $item['maxallfullbackallprice'];
+				}
+				 else {
+					$opcontent = $item['minallfullbackallratio'] . '% ~ ' . $item['maxallfullbackallratio'] . '%';
+				}
 
-        $options['value'] = isset($options['value']) ? $options['value'] : $titles;
+				$html .= '<a class=\'btn btn-default btn-sm\' data-toggle=\'ajaxModal\' href=\'' . webUrl($optionurl, array('goodsid' => $item['goodsid'], 'id' => $item['id'])) . '\' id=\'optiontitle' . $item['goodsid'] . '\'>' . $opcontent . '</a>' . "\r\n" . '                            <input type=\'hidden\' id=\'fullbackgoods' . $item['goodsid'] . '\' value=\'' . $item['optionid'] . '\' name=\'fullbackgoods[' . $item['goodsid'] . ']\'>';
 
-        $readonly = $options['readonly'] ? 'readonly' : '';
-        $required = $options['required'] ? ' data-rule-required="true"' : '';
-        $callback = !empty($options['callback']) ? ", {$options['callback']}" : '';
-        $id = $options['multi'] ? "{$name}[]" : $name;
-        $html = "<div id='{$name}_selector' class='selector'
-                     data-type=\"{$options['type']}\"
-                     data-key=\"{$options['key']}\"
-                     data-text=\"{$options['text']}\"
-                     data-thumb=\"{$options['thumb']}\"
-                     data-multi=\"{$options['multi']}\"
-                     data-callback=\"{$options['callback']}\"
-                     data-url=\"{$options['url']}\",
-                     data-nokeywords=\"{$options['nokeywords']}\" 
-                     data-autosearch=\"{$options['autosearch']}\"
-                     data-optionurl=\"{$options['optionurl']}\"
-                     data-selectorid=\"{$options['selectorid']}\"
- 
-                 >";
-        if ($options['input']) {
-            $html .= "<div class='input-group'>"
-                . "<input type='text' id='{$name}_text' name='{$name}_text'  value='{$options['value']}' class='form-control text'  {$readonly}  {$required}/>"
-                . "<div class='input-group-btn'>";
-        }
-        $html .= "<button class='btn btn-primary' type='button' onclick='biz.selector_new.select(" . json_encode($options) . ");'>{$options['buttontext']}</button>";
-        if ($options['input']) {
-            $html .= "</div>";
-            $html .= "</div>";
-        }
+				foreach ($item['option'] as $option ) {
+					$html .= '<input type=\'hidden\' value=\'' . $option['allfullbackprice'] . ',' . $option['fullbackprice'] . ',' . $option['allfullbackratio'] . ',' . $option['fullbackratio'] . ',' . $option['day'] . '\'' . "\r\n" . '                        name=\'fullbackgoodsoption' . $option['id'] . '\' >';
+				}
+			}
+			 else {
+				if ($item['type'] == 0) {
+					$content = '&yen;' . $item['minallfullbackallprice'];
+				}
+				 else {
+					$content = $item['minallfullbackallratio'] . '%';
+				}
 
+				$html .= '<a class=\'btn btn-default btn-sm\' data-toggle=\'ajaxModal\' href=\'' . webUrl($optionurl, array('goodsid' => $item['goodsid'], 'id' => $item['id'])) . '\' id=\'' . $options['selectorid'] . 'optiontitle' . $item['goodsid'] . '\'>' . $content . '</a>' . "\r\n" . '                            <input type=\'hidden\' id=\'fullbackgoods' . $item['goodsid'] . '\' value=\'\' name=\'fullbackgoods[' . $item['goodsid'] . ']\'>' . "\r\n" . '                    <input type=\'hidden\' value=\'' . $item['minallfullbackallprice'] . ',' . $item['fullbackprice'] . ',' . $item['minallfullbackallratio'] . ',' . $item['fullbackratio'] . ',' . $item['day'] . '\' name=\'goods' . $item['goodsid'] . '\' >';
+			}
 
-        $show = $options['preview'] ? '' : " style='display:none'";
-
-        if ($options['type'] == 'image') {
-            $html .= "<div class='input-group multi-img-details container' $show>";
-        } else {
-
-
-            $html .= "<div class='input-group multi-audio-details container' $show>
-<table class='table' style='width:600px;'>
-                    <thead>
-                        <tr>
-                            <th style='width:80px;'>商品名称</th>
-                            <th style='width:220px;'></th>
-                            <th>价格/分销佣金</th>
-                            <th style='width:50px;'>操作</th>
-                        </tr>
-                    </thead>
-                    <tbody id='param-items{$options['selectorid']}' class='ui-sortable'>";
-        }
-
-        foreach ($options['items'] as $item) {
-            if ($options['type'] == 'image') {
-                $html .= "<div class='multi-item' data-{$options['key']}='{$item[$options['key']]}' data-name='{$name}'>
-                                      <img class='img-responsive img-thumbnail' src='" . tomedia($item[$options['thumb']]) . "'>
-                                      <div class='img-nickname'>{$item[$options['text']]}</div>
-                                     <input type='hidden' value='{$item[$options['key']]}' name='{$id}'>
-                                     <em onclick='biz.selector_new.remove(this,\"{$name}\")'  class='close'>×</em>
-                         </div>";
-            } elseif ($options['type'] == 'product') {
-                if ($item['optiontitle']) {
-                    $optiontitle = $item['optiontitle'][0]['title'] . "...";
-                } else {
-                    $optiontitle = "&yen;" . $item['packageprice'];
-                }
-
-                $html .= "
-                    <tr class='multi-product-item' data-{$options['key']}='{$item['goodsid']}' >
-                        <input type='hidden' class='form-control img-textname' readonly='' value='{$item[$options['text']]}'>
-                       <input type='hidden'  value='{$item['goodsid']}' name='{$id}'>
-                        <td style='width:80px;'>
-                            <img src='" . tomedia($item[$options['thumb']]) . "' style='width:70px;border:1px solid #ccc;padding:1px'>
-                        </td>
-                        <td style='width:220px;'>{$item[$options['text']]}</td>
-                        <td>";
-                $optionurl = empty($options['optionurl']) ? 'sale/package/hasoption' : str_replace(".", "/", $options['optionurl']);
-                if ($item['optiontitle']) {
-
-                    $html .= "<a class='btn btn-default btn-sm' data-toggle='ajaxModal' href='" . webUrl($optionurl,
-                            array('goodsid' => $item['goodsid'], 'pid' => $item['pid'], 'selectorid' => $options['selectorid'])) . "' id='{$options['selectorid']}optiontitle" . $item['goodsid'] . "'>" . $optiontitle . "</a>
-                            <input type='hidden' id='{$options['selectorid']}packagegoods" . $item['goodsid'] . "' value='" . $item['option'] . "' name='{$options['selectorid']}packagegoods[" . $item['goodsid'] . "]'>";
-                    foreach ($item['optiontitle'] as $option) {
-                        $total = isset($option['total']) ? "," . $option['total'] : '';
-                        $maxbuy = isset($option['maxbuy']) ? "," . $option['maxbuy'] : '';
-                        $totalmaxbuy = isset($option['totalmaxbuy']) ? "," . $option['totalmaxbuy'] : '';
-
-                        $html .= "<input type='hidden' value='" . $option['packageprice'] . "," . $option['commission1'] . "," . $option['commission2'] . "," . $option['commission3'] . "{$total}{$maxbuy}{$totalmaxbuy}'
-                        name='{$options['selectorid']}packagegoodsoption" . $option['optionid'] . "' >";
-                    }
-                } else {
-                    $total = isset($item['total']) ? "," . $item['total'] : '';
-                    $maxbuy = isset($item['maxbuy']) ? "," . $item['maxbuy'] : '';
-                    $totalmaxbuy = isset($item['totalmaxbuy']) ? "," . $item['totalmaxbuy'] : '';
-                    $html .= "<a class='btn btn-default btn-sm' data-toggle='ajaxModal' href='" . webUrl($optionurl,
-                            array('goodsid' => $item['goodsid'], 'pid' => $item['pid'], 'selectorid' => $options['selectorid'])) . "' id='{$options['selectorid']}optiontitle" . $item['goodsid'] . "'>&yen;" . $item['packageprice'] . "</a>
-                            <input type='hidden' id='{$options['selectorid']}packagegoods" . $item['goodsid'] . "' value='' name='{$options['selectorid']}packagegoods[" . $item['goodsid'] . "]'>
-                    <input type='hidden' value='" . $item['packageprice'] . "," . $item['commission1'] . "," . $item['commission2'] . "," . $item['commission3'] . "{$total}{$maxbuy}{$totalmaxbuy}' name='{$options['selectorid']}packgoods" . $item['goodsid'] . "' >";
-                }
-                $html .= "
-                        </td>
-                        <td><a href='javascript:void(0);' class='btn btn-default btn-sm' onclick='biz.selector_new.remove(this,\"{$name}\")' title='删除'>
-                        <i class='fa fa-times'></i></a></td>
-                    </tr>";
-            } else {
-                $html .= "<div class='multi-audio-item ' data-{$options['key']}='{$item[$options['c']]}' >
-                       <div class='input-group'>
-                       <input type='text' class='form-control img-textname' readonly='' value='{$item[$options['text']]}'>
-                       <input type='hidden'  value='{$item[$options['key']]}' name='{$id}'>
-                       <div class='input-group-btn'><button class='btn btn-default' onclick='biz.selector_new.remove(this,\"{$name}\")' type='button'><i class='fa fa-remove'></i></button>
-                       </div></div></div>";
-            }
-        }
-        $html .= "</tbody>
-                </table></div></div>";
-
-        return $html;
-    }
+			$html .= "\r\n" . '                        </td>' . "\r\n" . '                        <td style=\'text-align: right;\'><a href=\'javascript:void(0);\' class=\'btn btn-default btn-sm\' onclick=\'biz.selector_new.remove(this,"' . $name . '")\' title=\'删除\'>' . "\r\n" . '                        <i class=\'fa fa-times\'></i></a></td>' . "\r\n" . '                    </tr>';
+		}
+		 else {
+				$html .= '<div class=\'multi-audio-item \' data-' . $options['key'] . '=\'' . $item[$options['c']] . '\' >' . "\r\n" . '                       <div class=\'input-group\'>' . "\r\n" . '                       <input type=\'text\' class=\'form-control img-textname\' readonly=\'\' value=\'' . $item[$options['text']] . '\'>' . "\r\n" . '                       <input type=\'hidden\'  value=\'' . $item[$options['key']] . '\' name=\'' . $id . '\'>' . "\r\n" . '                       <div class=\'input-group-btn\'><button class=\'btn btn-default\' onclick=\'biz.selector_new.remove(this,"' . $name . '")\' type=\'button\'><i class=\'fa fa-remove\'></i></button>' . "\r\n" . '                       </div></div></div>';
+			}
+		}
+		$html .= '</tbody>' . "\r\n" . '                </table></div></div>';
+		return $html;
+	}
 }
 if (!(function_exists('tpl_daterange'))) 
 {
@@ -787,7 +758,7 @@ if (!(function_exists('tpl_daterange')))
 				$str = date('Y-m-d H:i', strtotime($value['starttime'])) . ' 至 ' . date('Y-m-d  H:i', strtotime($value['endtime']));
 			}
 		}
-		$s .= '<div style="float:left">' . "\r\n\t" . '<input name="' . $name . '[start]' . '" type="hidden" value="' . $value['starttime'] . '" />' . "\r\n\t" . '<input name="' . $name . '[end]' . '" type="hidden" value="' . $value['endtime'] . '" />' . "\r\n" . '           </div>' . "\r\n" . '          <div class="btn-group ' . (($small ? 'btn-group-sm' : '')) . '" style="' . $value['style'] . 'padding-right:0;"  >' . "\r\n" . '          ' . "\r\n\t" . '<button style="width:240px" class="btn btn-default daterange ' . ((!(empty($time)) ? 'daterange-time' : 'daterange-date')) . '"  type="button"><span class="date-title">' . $str . '</span></button>' . "\r\n" . '        <button class="btn btn-default ' . (($small ? 'btn-sm' : '')) . '" " type="button" onclick="clearTime(this)" placeholder="' . $placeholder . '"><i class="fa fa-remove"></i></button>' . "\r\n" . '         </div>' . "\r\n\t";
+		$s .= '<div style="float:left">' . "\r\n\t" . '<input name="' . $name . '[start]' . '" type="hidden" value="' . $value['starttime'] . '" />' . "\r\n\t" . '<input name="' . $name . '[end]' . '" type="hidden" value="' . $value['endtime'] . '" />' . "\r\n" . '           </div>' . "\r\n" . '          <div class="btn-group ' . (($small ? 'btn-group-sm' : '')) . '" style="padding-right:0;"  >' . "\r\n" . '          ' . "\r\n\t" . '<button style="width:240px" class="btn btn-default daterange ' . ((!(empty($time)) ? 'daterange-time' : 'daterange-date')) . '"  type="button"><span class="date-title">' . $str . '</span></button>' . "\r\n" . '        <button class="btn btn-default ' . (($small ? 'btn-sm' : '')) . '" " type="button" onclick="clearTime(this)" placeholder="' . $placeholder . '"><i class="fa fa-remove"></i></button>' . "\r\n" . '         </div>' . "\r\n\t";
 		return $s;
 	}
 }
@@ -997,7 +968,7 @@ if (!(function_exists('save_media')))
 		if ($com) 
 		{
 			$qiniu_url = $com->save($url, NULL, $enforceQiniu);
-			if (!(empty($qiniu_url)) && !(is_error($qiniu_url))) 
+			if (!(empty($qiniu_url))) 
 			{
 				return $qiniu_url;
 			}
@@ -1153,15 +1124,15 @@ if (!(function_exists('redis')))
 			{
 				$redis_temp->auth($config['requirepass']);
 			}
-			try 
-			{
-				$ping = $redis_temp->ping();
-			}
-			catch (ErrorException $e) 
-			{
-				return error(-1, 'redis 无法正常工作，请检查 redis 服务');
-			}
-			if ($ping != '+PONG') 
+                        try {
+			        $ping = $redis_temp->ping();
+	         	}
+		        catch (ErrorException $e) {
+			         return error(-1, 'redis 无法正常工作，请检查 redis 服务');
+		        }
+
+		if ($ping != '+PONG')
+
 			{
 				return error(-1, 'redis 无法正常工作，请检查 redis 服务');
 			}
@@ -1177,18 +1148,21 @@ if (!(function_exists('logg')))
 		global $_W;
 		$data = ((is_array($data) ? json_encode($data, JSON_UNESCAPED_UNICODE) : $data));
 		file_put_contents(IA_ROOT . '/' . $name, $data);
-	}
 }
-if (!(function_exists('is_wxerror'))) 
+}
+
+
+if (!(function_exists('is_wxerror'))) {
+function is_wxerror($data)
 {
-	function is_wxerror($data) 
-	{
-		if (empty($data) || !(is_array($data)) || !(array_key_exists('errcode', $data)) || (array_key_exists('errcode', $data) && ($data['errcode'] == 0))) 
-		{
-			return false;
-		}
-		return true;
+	if (empty($data) || !(is_array($data)) || !(array_key_exists('errcode', $data)) || (array_key_exists('errcode', $data) && ($data['errcode'] == 0))) {
+		return false;
 	}
+
+
+	return true;
 }
+}
+
 
 ?>
