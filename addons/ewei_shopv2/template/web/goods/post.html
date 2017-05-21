@@ -43,7 +43,7 @@
                 {/if}
 
                 {if $merchid == 0}
-                <li {if $_GPC['tab']=='verify'}class="active"{/if}><a href="#tab_verify">线下核销</a></li>
+                <li {if $_GPC['tab']=='verify'}class="active"{/if}  {if ($item['type'] == 2 || $item['type'] == 3 || $item['type'] == 10 || $item['type'] == 20)}style="display: none;"{/if} id="tab_nav_verify"><a href="#tab_verify">线下核销</a></li>
                 {/if}
 
                 {if p('diyform')}
@@ -85,7 +85,7 @@
                 {/if}
 
                 {if $merchid == 0}
-                <div class="tab-pane {if $_GPC['tab']=='verify'}active{/if}" id="tab_verify"> <div class="panel-body">{template 'goods/tab/verify'}</div></div>
+                <div class="tab-pane {if $_GPC['tab']=='verify'}active{/if}" id="tab_verify" {if ($item['type'] == 2 || $item['type'] == 3|| $item['type'] == 10|| $item['type'] == 20)}style="display: none;"{/if}> <div class="panel-body">{template 'goods/tab/verify'}</div></div>
                 {/if}
 
                 {if p('diyform')}
@@ -103,7 +103,6 @@
                 {if p('ccard')}
                 <div class="tab-pane {if $_GPC['tab']=='ccard'}active{/if}" id="tab_ccard"> <div class="panel-body">{template 'ccard/explain'}</div></div>
                 {/if}
-
             </div>
         </div>
     </div>
@@ -654,21 +653,43 @@
     function type_change(type) {
         var ccard = {php echo intval($ccard)};
 
-        if(type == 1) {
+
+		if(type == 4) {
+			$(".interval").show();
+			$(".price").hide();
+			$(".minbuy").hide();
+
+			$(".wholesalewarning").show();
+
+
+		}else
+		{
+			$(".interval").hide();
+			$(".price").show();
+			$(".minbuy").show();
+			$(".wholesalewarning").hide();
+		}
+
+
+        if(type == 1||type == 4) {
             $('#product').show();
             $('#type_virtual').hide();
             $('.entity').show();
+            $("#tab_nav_verify").show();
         } else if(type == 2) {
             $('#product').hide();
             $('#type_virtual').hide();
             $('.entity').hide();
+            $("#tab_nav_verify").hide();
         } else if(type == 3) {
             $('#type_virtual').show();
             $('.entity').hide();
-        } else if(type == 10) {
+            $("#tab_nav_verify").hide();
+        }else if(type == 10) {
             $('#type_virtual').hide();
             $('#product').hide();
             $('.entity').hide();
+            $("#tab_nav_verify").hide();
         } else if(type == 20) {
             $('#type_virtual').hide();
             $('#product').hide();
@@ -678,7 +699,7 @@
             $('#a_sell').html('返佣');
             $('.commission1-group').html('会员购买返佣');
             $('.commission2-group').html('上级返佣');
-
+            $("#tab_nav_verify").hide();
         }
 
         if (ccard == 1 && type != 20) {
