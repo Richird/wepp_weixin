@@ -1,30 +1,37 @@
 <?php
-//weichengtech
+if (!(defined('IN_IA'))) {
+	exit('Access Denied');
+}
+
 class Util_EweiShopV2Model
 {
 	public function getExpressList($express, $expresssn)
 	{
 		global $_W;
 		$express_set = $_W['shopset']['express'];
-		$express = ($express == 'jymwl' ? 'jiayunmeiwuliu' : $express);
-		$express = ($express == 'TTKD' ? 'tiantian' : $express);
-		$express = ($express == 'jjwl' ? 'jiajiwuliu' : $express);
-		$express = ($express == 'zhongtiekuaiyun' ? 'ztky' : $express);
+		$express = (($express == 'jymwl' ? 'jiayunmeiwuliu' : $express));
+		$express = (($express == 'TTKD' ? 'tiantian' : $express));
+		$express = (($express == 'jjwl' ? 'jiajiwuliu' : $express));
+		$express = (($express == 'zhongtiekuaiyun' ? 'ztky' : $express));
 		load()->func('communication');
-		if (!empty($express_set['isopen']) && !empty($express_set['apikey'])) {
-			if (!empty($express_set['cache']) && (0 < $express_set['cache'])) {
+
+		if (!(empty($express_set['isopen'])) && !(empty($express_set['apikey']))) {
+			if (!(empty($express_set['cache'])) && (0 < $express_set['cache'])) {
 				$cache_time = $express_set['cache'] * 60;
 				$cache = pdo_fetch('SELECT * FROM' . tablename('ewei_shop_express_cache') . 'WHERE express=:express AND expresssn=:expresssn LIMIT 1', array('express' => $express, 'expresssn' => $expresssn));
-				if ((time() <= $cache['lasttime'] + $cache_time) && !empty($cache['datas'])) {
+
+				if ((time() <= $cache['lasttime'] + $cache_time) && !(empty($cache['datas']))) {
 					return iunserializer($cache['datas']);
 				}
+
 			}
+
 
 			if ($express_set['isopen'] == 1) {
 				$url = 'http://api.kuaidi100.com/api?id=' . $express_set['apikey'] . '&com=' . $express . '&nu=' . $expresssn;
 				$params = array();
 			}
-			else {
+			 else {
 				$url = 'http://poll.kuaidi100.com/poll/query.do';
 				$params = array('customer' => $express_set['customer'], 'param' => json_encode(array('com' => $express, 'num' => $expresssn)));
 				$params['sign'] = md5($params['param'] . $express_set['apikey'] . $params['customer']);
@@ -36,32 +43,36 @@ class Util_EweiShopV2Model
 			$info = json_decode($content, true);
 		}
 
-		if (!isset($info) || empty($info['data']) || !is_array($info['data'])) {
+
+		if (!(isset($info)) || empty($info['data']) || !(is_array($info['data']))) {
 			$url = 'https://www.kuaidi100.com/query?type=' . $express . '&postid=' . $expresssn . '&id=1&valicode=&temp=';
 			$response = ihttp_request($url);
 			$content = $response['content'];
 			$info = json_decode($content, true);
 			$useapi = false;
 		}
-		else {
+		 else {
 			$useapi = true;
 		}
 
 		$list = array();
-		if (!empty($info['data']) && is_array($info['data'])) {
-			foreach ($info['data'] as $index => $data) {
+
+		if (!(empty($info['data'])) && is_array($info['data'])) {
+			foreach ($info['data'] as $index => $data ) {
 				$list[] = array('time' => trim($data['time']), 'step' => trim($data['context']));
 			}
 		}
 
-		if ($useapi && (0 < $express_set['cache']) && !empty($list)) {
+
+		if ($useapi && (0 < $express_set['cache']) && !(empty($list))) {
 			if (empty($cache)) {
 				pdo_insert('ewei_shop_express_cache', array('expresssn' => $expresssn, 'express' => $express, 'lasttime' => time(), 'datas' => iserializer($list)));
 			}
-			else {
+			 else {
 				pdo_update('ewei_shop_express_cache', array('lasttime' => time(), 'datas' => iserializer($list)), array('id' => $cache['id']));
 			}
 		}
+
 
 		return $list;
 	}
@@ -87,7 +98,9 @@ class Util_EweiShopV2Model
 			if ($statusCode == 200) {
 				$found = true;
 			}
+
 		}
+
 
 		curl_close($curl);
 		return $found;
@@ -114,22 +127,23 @@ class Util_EweiShopV2Model
 			$s /= 1000;
 		}
 
+
 		return round($s, $decimal);
 	}
 
 	public function multi_array_sort($multi_array, $sort_key, $sort = SORT_ASC)
 	{
 		if (is_array($multi_array)) {
-			foreach ($multi_array as $row_array) {
+			foreach ($multi_array as $row_array ) {
 				if (is_array($row_array)) {
 					$key_array[] = $row_array[$sort_key];
 				}
-				else {
+				 else {
 					return false;
 				}
 			}
 		}
-		else {
+		 else {
 			return false;
 		}
 
@@ -145,6 +159,7 @@ class Util_EweiShopV2Model
 			$uniacid = $_W['uniacid'];
 		}
 
+
 		$sql = 'select * from ' . tablename('ewei_shop_area_config') . ' where uniacid=:uniacid limit 1';
 		$data = pdo_fetch($sql, array(':uniacid' => $uniacid));
 		return $data;
@@ -159,12 +174,61 @@ class Util_EweiShopV2Model
 			$data = $this->get_area_config_data();
 		}
 
+
 		return $data;
+	}
+
+	public function pwd_encrypt($string, $operation, $key = 'key')
+	{
+		$key = md5($key);
+		$key_length = strlen($key);
+		$string = (($operation == 'D' ? base64_decode($string) : substr(md5($string . $key), 0, 8) . $string));
+		$string_length = strlen($string);
+		$rndkey = $box = array();
+		$result = '';
+		$i = 0;
+
+		while ($i <= 255) {
+			$rndkey[$i] = ord($key[$i % $key_length]);
+			$box[$i] = $i;
+			++$i;
+		}
+
+		$j = $i = 0;
+
+		while ($i < 256) {
+			$j = ($j + $box[$i] + $rndkey[$i]) % 256;
+			$tmp = $box[$i];
+			$box[$i] = $box[$j];
+			$box[$j] = $tmp;
+			++$i;
+		}
+
+		$a = $j = $i = 0;
+
+		while ($i < $string_length) {
+			$a = ($a + 1) % 256;
+			$j = ($j + $box[$a]) % 256;
+			$tmp = $box[$a];
+			$box[$a] = $box[$j];
+			$box[$j] = $tmp;
+			$result .= chr(ord($string[$i]) ^ $box[($box[$a] + $box[$j]) % 256]);
+			++$i;
+		}
+
+		if ($operation == 'D') {
+			if (substr($result, 0, 8) == substr(md5(substr($result, 8) . $key), 0, 8)) {
+				return substr($result, 8);
+			}
+
+
+			return '';
+		}
+
+
+		return str_replace('=', '', base64_encode($result));
 	}
 }
 
-if (!defined('IN_IA')) {
-	exit('Access Denied');
-}
 
 ?>

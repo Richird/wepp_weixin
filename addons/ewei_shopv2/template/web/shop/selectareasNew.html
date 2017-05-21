@@ -31,49 +31,31 @@
                 </div>
                 <div class="row row-areas form-horizontal">
                     <div class="item">
-                        {loop $areas['province'] $value}
-                        <div class="child p-group">
-                            <label class="checkbox-inline " style="cursor: default">{php echo $value['@attributes']['name']}</label>
-                            <label class="checkbox-inline pull-right">
-                                <input type="checkbox" id="ch_pcode{php echo $value['@attributes']['code']}" class="provinceall" value="{php echo $value['@attributes']['name']}" data-value="{php echo $value['@attributes']['code']}" title="选择" />
-                            </label>
-                        </div>
-                        {/loop}
-                    </div>
 
-                    <div class="item">
-                        {loop $areas['province'] $value}
-                            {loop $value['city'] $city}
-                                <div class="child c-group clist pcode_c{php echo $value['@attributes']['code']}" style="display: none;">
-                                    <label class="checkbox-inline " style="cursor: default">{php echo $city['@attributes']['name']}</label>
-                                    <label class="checkbox-inline pull-right">
-                                        <input type="checkbox" id="ch_ccode{php echo $city['@attributes']['code']}" class="cityall checkbox_pcode{php echo $value['@attributes']['code']}" value="{php echo $city['@attributes']['name']}" data-value="{php echo $city['@attributes']['code']}" pcode="{php echo $value['@attributes']['code']}" pname="{php echo $value['@attributes']['name']}" title="选择" />
-                                    </label>
-                                </div>
+                        {if empty($areas['stp'])}
+                            {loop $areas['province'] $value}
+                            <div class="child p-group">
+                                <label class="checkbox-inline " style="cursor: default">{php echo $value['@attributes']['name']}</label>
+                                <label class="checkbox-inline pull-right">
+                                    <input type="checkbox" id="ch_pcode{php echo $value['@attributes']['code']}" class="provinceall" value="{php echo $value['@attributes']['name']}" data-value="{php echo $value['@attributes']['code']}" title="选择" />
+                                </label>
+                            </div>
                             {/loop}
-                        {/loop}
-                    </div>
-
-                    <div class="item">
-                        {loop $areas['province'] $value}
-                            {loop $value['city'] $city}
-                                {loop $city['county'] $county}
-                                    <div class="child a-group alist pcode_a{php echo $value['@attributes']['code']} ccode_a{php echo $city['@attributes']['code']}" style="display: none;">
-                                        <label class="checkbox-inline " style="cursor: default">{php echo $county['@attributes']['name']}</label>
-                                        <label class="checkbox-inline pull-right">
-                                            <input type="checkbox" id="ch_acode{php echo $county['@attributes']['code']}" class="areaall checkbox_pcode{php echo $value['@attributes']['code']} checkbox_ccode{php echo $city['@attributes']['code']}" value="{php echo $county['@attributes']['name']}" data-value="{php echo $county['@attributes']['code']}" ccode="{php echo $city['@attributes']['code']}" pcode="{php echo $value['@attributes']['code']}" cname="{php echo $city['@attributes']['name']}" pname="{php echo $value['@attributes']['name']}" title="选择" />
-                                        </label>
-                                    </div>
-                                {/loop}
-                            {/loop}
-                        {/loop}
-                    </div>
-
-                    <!--div class="col-sm-3" style="height:300px;overflow:auto" id="street_list">
-                    </div-->
-
+                        {else}
+                            {php echo $areas['stp'];}
+                        {/if}
 
                     </div>
+
+                    <div class="item" id="d_item">
+
+                    </div>
+
+                    <div class="item" id="a_item">
+
+                    </div>
+
+                </div>
                 <div class="row" style="margin-top:10px;display: none;">
                     已选择城市:<span id="city_info"></span>
                 </div>
@@ -95,6 +77,7 @@
     var last_area_code  = 0;
     var xmlCityDoc;
     var xml_list = new Array();
+    var load_list = new Array();
 
     $(function(){
 
@@ -110,7 +93,7 @@
 
         $('.p-group').click(function(){
             var province_code = $(this).find('input').attr('data-value');
-
+            load_data(province_code);
             load_city(2, province_code, 0, 0);
         });
 
@@ -119,13 +102,14 @@
             load_city(2, 0, city_code, 0);
         });
 
-        $('.a-group').click(function(){
-            var area_code = $(this).find('input').attr('data-value');
-            load_city(2, 0, 0, area_code);
-        });
+//        $('.a-group').click(function(){
+//            var area_code = $(this).find('input').attr('data-value');
+//            load_city(2, 0, 0, area_code);
+//        });
 
         $('.provinceall').click(function(){
             var province_code = $(this).attr('data-value');
+            load_data(province_code);
             var checked = $(this).get(0).checked;
             var flag = 0;
 
@@ -195,8 +179,50 @@
         $('#street_list').append(html);
     }
 
-    function load_city(flag, province_code, city_code, area_code){
 
+
+    function load_data(province_code){
+        if (province_code > 0) {
+
+            if($.inArray(province_code, load_list) == -1) {
+                $.ajax({
+                    type: "POST",
+                    url: "{php echo webUrl('util/area/ajax')}",
+                    data: {"province_code":province_code},
+                    async: false,
+                    dataType: "json",
+                    success: function (data) {
+                        var res = data.result;
+                        $("#d_item").append(res.stc);
+                        $("#a_item").append(res.sta);
+
+                        $('.c-group').click(function(){
+                            var city_code = $(this).find('input').attr('data-value');
+                            load_city(2, 0, city_code, 0);
+                        });
+
+                        $('.cityall').click(function(){
+                            var city_code = $(this).attr('data-value');
+                            var checked = $(this).get(0).checked;
+                            var flag = 0;
+
+                            if(checked){
+                                flag = 1;
+                            }
+
+                            load_city(flag, 0, city_code, 0);
+                        });
+
+                        select_load(province_code);
+                    }
+                });
+                load_list.push(province_code);
+            }
+        }
+    }
+
+
+    function load_city(flag, province_code, city_code, area_code){
         if (province_code >0 ) {
             $('.clist').hide();
             $('.alist').hide();
@@ -286,6 +312,7 @@
             for(var i in old_areas){
                 var area_info = old_areas[i].split(' ');
                 if(area_info[0]) {
+                    load_data(area_info[0]);
                     $('#ch_pcode'+area_info[0]).prop("checked",true);
                 }
                 if(area_info[1]) {
@@ -308,6 +335,7 @@
             $('.' + current + ' .cityshtml').html(city_html);
             $('.' + current + ' .citys').val(city_html);
             $('.' + current + ' .citys_code').val(area_html);
+            load_list =[];
          })
 
 
@@ -372,14 +400,15 @@
 
                 var area_info = old_areas[i].split(' ');
                 if(area_info[0]) {
+                    load_data(area_info[0]);
                     $('#ch_pcode'+area_info[0]).prop("checked",true);
                 }
-                if(area_info[1]) {
-                    $('#ch_ccode'+area_info[1]).prop("checked",true);
-                }
-                if(area_info[2]) {
-                    $('#ch_acode'+area_info[2]).prop("checked",true);
-                }
+//                if(area_info[1]) {
+//                    $('#ch_ccode'+area_info[1]).prop("checked",true);
+//                }
+//                if(area_info[2]) {
+//                    $('#ch_acode'+area_info[2]).prop("checked",true);
+//                }
             }
         }
 
@@ -392,7 +421,26 @@
             $('#areas').html(city_html);
             $("#selectedareas").val(city_html);
             $("#selectedareas_code").val(area_html);
+            load_list =[];
         })
+    }
+
+    function select_load(province_code){
+        var old_areas = $('#selectedareas_code').val().split(';');
+
+        if(old_areas) {
+            for(var i in old_areas){
+                var area_info = old_areas[i].split(' ');
+                if (area_info[0] == province_code) {
+                    if(area_info[1]) {
+                        $('#ch_ccode'+area_info[1]).prop("checked",true);
+                    }
+                    if(area_info[2]) {
+                        $('#ch_acode'+area_info[2]).prop("checked",true);
+                    }
+                }
+            }
+        }
     }
 
 </script>
