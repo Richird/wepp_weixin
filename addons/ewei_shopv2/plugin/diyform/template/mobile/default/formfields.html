@@ -21,7 +21,7 @@
         {/if}
     </div>
 
-    <div class='fui-cell-info'>
+    <div class='fui-cell-info' {if $v1['data_type'] == 13}style="white-space:normal;"{/if}>
 
         {if $v1['data_type'] == 0}
 
@@ -64,9 +64,6 @@
         <input type="file"name='imgFile{php echo $i}' id='imgFile{php echo $i}' {if !is_h5app() || (is_h5app() && is_ios())}multiple="" accept="image/*" {/if} >
     </div>
 
-
-
-
     {else if $v1['data_type'] == 6}
     <input type="text" class='fui-input' id='field_data{php echo $i}' name='field_data{php echo $i}' placeholder="请输入{$v1['tp_name']}" maxlength="18" value="{php echo $f_data[$k1]}" />
 
@@ -94,7 +91,8 @@
     <input type="text" class='fui-input timepicker'  id="field_data{php echo $i}_0" name='field_data{php echo $i}' placeholder="开始时间" value='{if !empty($f_data[$k1][0])}{php echo $f_data[$k1][0]}{/if}' style='width:40%;float:left;' readonly/>
 
     <input type="text" class='fui-input timepicker'  id="field_data{php echo $i}_1" name='field_data{php echo $i}' placeholder="结束时间" value='{if !empty($f_data[$k1][1])}{php echo $f_data[$k1][1]}{/if}' style='width:40%;float:left;margin-left:5px;' readonly/>
-
+    {else if $v1['data_type'] == 13}
+        {$v1['tp_text']}
     {/if}
 
 </div>
