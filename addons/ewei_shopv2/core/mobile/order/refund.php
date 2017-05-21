@@ -1,6 +1,5 @@
 <?php
-//weichengtech
-if (!defined('IN_IA')) {
+if (!(defined('IN_IA'))) {
 	exit('Access Denied');
 }
 
@@ -16,78 +15,84 @@ class Refund_EweiShopV2Page extends MobileLoginPage
 		$order = pdo_fetch('select id,status,price,refundid,goodsprice,dispatchprice,deductprice,deductcredit2,finishtime,isverify,`virtual`,refundstate,merchid from ' . tablename('ewei_shop_order') . ' where id=:id and uniacid=:uniacid and openid=:openid limit 1', array(':id' => $orderid, ':uniacid' => $uniacid, ':openid' => $openid));
 
 		if (empty($order)) {
-			if (!$_W['isajax']) {
+			if (!($_W['isajax'])) {
 				header('location: ' . mobileUrl('order'));
 				exit();
 			}
-			else {
+			 else {
 				show_json(0, '订单未找到');
 			}
 		}
+
 
 		$_err = '';
 
 		if ($order['status'] == 0) {
 			$_err = '订单未付款，不能申请退款!';
 		}
-		else {
-			if ($order['status'] == 3) {
-				if (!empty($order['virtual']) || ($order['isverify'] == 1)) {
-					$_err = '此订单不允许退款!';
-				}
-				else {
-					if ($order['refundstate'] == 0) {
-						$tradeset = m('common')->getSysset('trade');
-						$refunddays = intval($tradeset['refunddays']);
+		 else if ($order['status'] == 3) {
+			if (!(empty($order['virtual'])) || ($order['isverify'] == 1)) {
+				$_err = '此订单不允许退款!';
+			}
+			 else if ($order['refundstate'] == 0) {
+				$tradeset = m('common')->getSysset('trade');
+				$refunddays = intval($tradeset['refunddays']);
 
-						if (0 < $refunddays) {
-							$days = intval((time() - $order['finishtime']) / 3600 / 24);
+				if (0 < $refunddays) {
+					$days = intval((time() - $order['finishtime']) / 3600 / 24);
 
-							if ($refunddays < $days) {
-								$_err = '订单完成已超过 ' . $refunddays . ' 天, 无法发起退款申请!';
-							}
-						}
-						else {
-							$_err = '订单完成, 无法申请退款!';
-						}
+					if ($refunddays < $days) {
+						$_err = '订单完成已超过 ' . $refunddays . ' 天, 无法发起退款申请!';
 					}
+
+				}
+				 else {
+					$_err = '订单完成, 无法申请退款!';
 				}
 			}
+
 		}
 
-		if (!empty($_err)) {
+
+		if (!(empty($_err))) {
 			if ($_W['isajax']) {
 				show_json(0, $_err);
 			}
-			else {
+			 else {
 				$this->message($_err, '', 'error');
 			}
 		}
+
 
 		$order['cannotrefund'] = false;
 
 		if ($order['status'] == 2) {
 			$goods = pdo_fetchall('select og.goodsid, og.price, og.total, og.optionname, g.cannotrefund, g.thumb, g.title from' . tablename('ewei_shop_order_goods') . ' og left join ' . tablename('ewei_shop_goods') . ' g on g.id=og.goodsid where og.orderid=' . $order['id']);
 
-			if (!empty($goods)) {
-				foreach ($goods as $g) {
+			if (!(empty($goods))) {
+				foreach ($goods as $g ) {
 					if ($g['cannotrefund'] == 1) {
 						$order['cannotrefund'] = true;
 						break;
 					}
+
 				}
 			}
+
 		}
+
 
 		if ($order['cannotrefund']) {
 			show_json(0, '此订单不可退换货');
 		}
+
 
 		$order['refundprice'] = $order['price'] + $order['deductcredit2'];
 
 		if (2 <= $order['status']) {
 			$order['refundprice'] -= $order['dispatchprice'];
 		}
+
 
 		$order['refundprice'] = round($order['refundprice'], 2);
 		return array('uniacid' => $uniacid, 'openid' => $_W['openid'], 'orderid' => $orderid, 'order' => $order, 'refundid' => $order['refundid']);
@@ -103,27 +108,32 @@ class Refund_EweiShopV2Page extends MobileLoginPage
 			$this->message('请不要重复提交!', '', 'error');
 		}
 
+
 		$refund = false;
 		$imgnum = 0;
 
 		if (0 < $order['refundstate']) {
-			if (!empty($refundid)) {
+			if (!(empty($refundid))) {
 				$refund = pdo_fetch('select * from ' . tablename('ewei_shop_order_refund') . ' where id=:id and uniacid=:uniacid and orderid=:orderid limit 1', array(':id' => $refundid, ':uniacid' => $uniacid, ':orderid' => $orderid));
 
-				if (!empty($refund['refundaddress'])) {
+				if (!(empty($refund['refundaddress']))) {
 					$refund['refundaddress'] = iunserializer($refund['refundaddress']);
 				}
+
 			}
 
-			if (!empty($refund['imgs'])) {
+
+			if (!(empty($refund['imgs']))) {
 				$refund['imgs'] = iunserializer($refund['imgs']);
 			}
+
 		}
+
 
 		if (empty($refund)) {
 			$show_price = round($order['refundprice'], 2);
 		}
-		else {
+		 else {
 			$show_price = round($refund['applyprice'], 2);
 		}
 
@@ -141,6 +151,7 @@ class Refund_EweiShopV2Page extends MobileLoginPage
 			show_json(0, '订单已经处理完毕!');
 		}
 
+
 		$price = trim($_GPC['price']);
 		$rtype = intval($_GPC['rtype']);
 
@@ -149,17 +160,20 @@ class Refund_EweiShopV2Page extends MobileLoginPage
 				show_json(0, '退款金额不能为0元');
 			}
 
+
 			if ($order['refundprice'] < $price) {
 				show_json(0, '退款金额不能超过' . $order['refundprice'] . '元');
 			}
+
 		}
+
 
 		$refund = array('uniacid' => $uniacid, 'merchid' => $order['merchid'], 'applyprice' => $price, 'rtype' => $rtype, 'reason' => trim($_GPC['reason']), 'content' => trim($_GPC['content']), 'imgs' => iserializer($_GPC['images']));
 
 		if ($refund['rtype'] == 2) {
 			$refundstate = 2;
 		}
-		else {
+		 else {
 			$refundstate = 1;
 		}
 
@@ -172,7 +186,7 @@ class Refund_EweiShopV2Page extends MobileLoginPage
 			$refundid = pdo_insertid();
 			pdo_update('ewei_shop_order', array('refundid' => $refundid, 'refundstate' => $refundstate), array('id' => $orderid, 'uniacid' => $uniacid));
 		}
-		else {
+		 else {
 			pdo_update('ewei_shop_order', array('refundstate' => $refundstate), array('id' => $orderid, 'uniacid' => $uniacid));
 			pdo_update('ewei_shop_order_refund', $refund, array('id' => $refundid, 'uniacid' => $uniacid));
 		}
@@ -204,9 +218,11 @@ class Refund_EweiShopV2Page extends MobileLoginPage
 			show_json(0, '参数错误!');
 		}
 
+
 		if (empty($_GPC['expresssn'])) {
 			show_json(0, '请填写快递单号');
 		}
+
 
 		$refund = array('status' => 4, 'express' => trim($_GPC['express']), 'expresscom' => trim($_GPC['expresscom']), 'expresssn' => trim($_GPC['expresssn']), 'sendtime' => time());
 		pdo_update('ewei_shop_order_refund', $refund, array('id' => $refundid, 'uniacid' => $uniacid));
@@ -224,6 +240,7 @@ class Refund_EweiShopV2Page extends MobileLoginPage
 		if (empty($refund)) {
 			show_json(0, '换货申请未找到!');
 		}
+
 
 		$time = time();
 		$refund_data = array();
@@ -250,5 +267,6 @@ class Refund_EweiShopV2Page extends MobileLoginPage
 		include $this->template('order/refundexpress');
 	}
 }
+
 
 ?>

@@ -1,17 +1,15 @@
 <?php
-//weichengtech
-if (!defined('IN_IA')) {
+if (!(defined('IN_IA'))) 
+{
 	exit('Access Denied');
 }
-
 require EWEI_SHOPV2_PLUGIN . 'merch/core/inc/page_merch.php';
-class Index_EweiShopV2Page extends MerchWebPage
+class Index_EweiShopV2Page extends MerchWebPage 
 {
-	public function main()
+	public function main() 
 	{
 		global $_W;
 		global $_GPC;
-		$this->model->CheckPlugin('taobao');
 		$time = strtotime(date('Y-m-d'));
 		$sysnumall = pdo_fetchcolumn('SELECT COUNT(*) FROM ' . tablename('ewei_shop_diypage') . ' where `type`>1 and `type`<99 and merch=:merch and uniacid=:uniacid ', array(':merch' => intval($_W['merchid']), ':uniacid' => $_W['uniacid']));
 		$sysnumtoday = pdo_fetchcolumn('SELECT COUNT(*) FROM ' . tablename('ewei_shop_diypage') . ' where `type`>1 and `type`<99 and createtime>:time and merch=:merch and uniacid=:uniacid ', array(':merch' => intval($_W['merchid']), ':uniacid' => $_W['uniacid'], ':time' => $time));
@@ -22,13 +20,12 @@ class Index_EweiShopV2Page extends MerchWebPage
 		$setmenu = $_W['shopset']['diypage']['setmenu'];
 		include $this->template();
 	}
-
-	public function setmenu()
+	public function setmenu() 
 	{
 		global $_W;
 		global $_GPC;
-
-		if ($_W['ispost']) {
+		if ($_W['ispost']) 
+		{
 			$status = intval($_GPC['status']);
 			$data = m('common')->getPluginset('diypage');
 			$data['setmenu'] = $status;
@@ -36,5 +33,4 @@ class Index_EweiShopV2Page extends MerchWebPage
 		}
 	}
 }
-
 ?>

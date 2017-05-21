@@ -3,7 +3,7 @@
 	<application setting="false">
 		<name><![CDATA[人人店]]></name>
 		<identifie><![CDATA[ewei_shopv2]]></identifie>
-		<version><![CDATA[3.3.9]]></version>
+		<version><![CDATA[3.4.2]]></version>
 		<type><![CDATA[business]]></type>
 		<ability><![CDATA[人人店]]></ability>
 		<description><![CDATA[人人店]]></description>
@@ -54,6 +54,6 @@
 	<permissions>
 	</permissions>
 	<install><![CDATA[install.php]]></install>
-	<uninstall><![CDATA[]]></uninstall>
-	<upgrade><![CDATA[]]></upgrade>
+	<uninstall><![CDATA[uninstall.php]]></uninstall>
+	<upgrade><![CDATA[upgrade.php]]></upgrade>
 </manifest>

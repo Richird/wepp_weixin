@@ -1,10 +1,10 @@
 <?php
-//weichengtech
+if (!(defined('IN_IA'))) {
+	exit('Access Denied');
+}
+
 class ComModel
 {}
 
-if (!defined('IN_IA')) {
-	exit('Access Denied');
-}
 
 ?>

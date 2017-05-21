@@ -1,5 +1,4 @@
 <?php
-//weichengtech
 if (!defined('IN_IA')) {
 	exit('Access Denied');
 }
@@ -129,7 +128,7 @@ class DiypageModel extends PluginModel
 												if ($good['id'] == $goodsid) {
 													$childid = rand(1000000000, 9999999999);
 													$childid = 'C' . $childid;
-													$item['data'][$childid] = array('thumb' => $good['thumb'], 'title' => $good['title'], 'price' => $good['minprice'], 'gid' => $good['id'], 'total' => $good['total'], 'bargain' => $good['bargain'], 'productprice' => $good['productprice'], 'credit' => $good['credit'], 'ctype' => $good['type'], 'gtype' => $good['goodstype'], 'sales' => $good['sales'] + intval($goods['salesreal']));
+													$item['data'][$childid] = array('thumb' => $good['thumb'], 'title' => $good['title'], 'price' => $good['minprice'], 'gid' => $good['id'], 'total' => $good['total'], 'bargain' => $good['bargain'], 'productprice' => $good['productprice'], 'credit' => $good['credit'], 'ctype' => $good['type'], 'gtype' => $good['goodstype'], 'sales' => $good['sales'] + intval($good['salesreal']));
 												}
 											}
 										}
@@ -650,7 +649,7 @@ class DiypageModel extends PluginModel
 									}
 									else {
 										$condition = ' and status=1 and deleted=0 and uniacid=:uniacid ';
-										$params = array('uniacid' => $_W['uniacid'], 'uniacid' => $_W['uniacid']);
+										$params = array(':uniacid' => $_W['uniacid']);
 
 										if ($item['params']['goodsdata'] == 5) {
 											$condition .= ' and isrecommand=1 ';
@@ -940,7 +939,7 @@ class DiypageModel extends PluginModel
 			$pagedata = $this->saveImg($pagedata);
 		}
 
-		$diypage = array('data' => base64_encode($pagedata), 'name' => $data['page']['name'], 'keyword' => $data['page']['keyword'], 'type' => $data['page']['type'], 'diymenu' => $data['page']['diymenu']);
+		$diypage = array('data' => base64_encode($pagedata), 'name' => $data['page']['name'], 'keyword' => $data['page']['keyword'], 'type' => $data['page']['type'], 'diymenu' => $data['page']['diymenu'], 'diyadv' => $data['page']['diyadv']);
 
 		if (!empty($id)) {
 			if ($update) {
@@ -1778,6 +1777,89 @@ class DiypageModel extends PluginModel
 		return $newData;
 	}
 
+	public function getStartAdvList($id)
+	{
+		global $_W;
+		$adv = pdo_fetch('SELECT * FROM' . tablename('ewei_shop_diypage_plu') . 'WHERE id=:id AND status=1 AND `type`=1 AND uniacid=:uniacid', array(':id' => $id, ':uniacid' => $_W['uniacid']));
+
+		if (empty($adv)) {
+			return NULL;
+		}
+
+		$adv['data'] = base64_decode($adv['data']);
+		$adv['data'] = json_decode($adv['data'], true);
+		return $adv['data'];
+	}
+
+	public function getStartAdv($id)
+	{
+		global $_W;
+		global $_GPC;
+
+		if (empty($id)) {
+			return NULL;
+		}
+
+		$startadv = p('diypage')->getStartAdvList($id);
+
+		if (empty($startadv)) {
+			return NULL;
+		}
+
+		if ((0 < $startadv['params']['showtype']) && (0 < $startadv['params']['showtime'])) {
+			$second = $startadv['params']['showtime'] * 60;
+			$key = 'diyadv-' . $_W['uniacid'] . '-' . $id;
+			$cookie = $_GPC[$key];
+			if (!empty($cookie) && (time() < ($cookie + $second))) {
+				return NULL;
+			}
+
+			isetcookie($key, time(), $second);
+		}
+
+		return $startadv;
+	}
+
+	public function getDanmuTime($item)
+	{
+		if (empty($item) || ($item <= 0)) {
+			return '刚刚';
+		}
+
+		if (is_numeric($item)) {
+			if ($item < 60) {
+				return $item . '秒前';
+			}
+
+			$item = round($item / 60);
+
+			if ($item < 60) {
+				return $item . '分钟前';
+			}
+
+			$item = round($item / 60);
+
+			if ($item < 24) {
+				return $item . '小时前';
+			}
+
+			$item = round($item / 24);
+			return $item . '天前';
+		}
+
+		if (strexists($item, '秒前') || strexists($item, '分钟') || strexists($item, '小时')) {
+			return $item;
+		}
+
+		$item = intval($item);
+
+		if ($item < 60) {
+			return $item . '秒前';
+		}
+
+		return round($item / 60) . '分钟前';
+	}
+
 	/**
      * *商品详情页
      * @param int $pageid
@@ -1887,7 +1969,7 @@ class DiypageModel extends PluginModel
 			}
 		}
 
-		return array('background' => $background, 'followbar' => $followbar, 'tab' => $detail_tab, 'navbar' => $detail_navbar, 'diynavbar' => $navbar, 'comment' => $detail_comment, 'seckill' => $detail_seckill, 'diylayer' => $page['data']['page']['diylayer'], 'items' => $pageitems);
+		return array('background' => $background, 'followbar' => $followbar, 'tab' => $detail_tab, 'navbar' => $detail_navbar, 'diynavbar' => $navbar, 'comment' => $detail_comment, 'seckill' => $detail_seckill, 'diylayer' => $page['data']['page']['diylayer'], 'items' => $pageitems, 'diyadv' => $page['data']['page']['diyadv'], 'danmu' => $page['data']['page']['danmu']);
 	}
 
 	/**
@@ -1924,7 +2006,7 @@ class DiypageModel extends PluginModel
 			}
 		}
 
-		return array('seckill_list' => $seckill_list, 'diylayer' => $page['data']['page']['diylayer'], 'diymenu' => $page['data']['page']['diymenu'], 'items' => $pageitems);
+		return array('seckill_list' => $seckill_list, 'diylayer' => $page['data']['page']['diylayer'], 'diymenu' => $page['data']['page']['diymenu'], 'diyadv' => $page['data']['page']['diyadv'], 'items' => $pageitems);
 	}
 
 	/**
@@ -1961,7 +2043,7 @@ class DiypageModel extends PluginModel
 			}
 		}
 
-		return array('exchange_input' => $exchange_input, 'items' => $pageitems);
+		return array('exchange_input' => $exchange_input, 'diyadv' => $page['data']['page']['diyadv'], 'items' => $pageitems);
 	}
 }
 

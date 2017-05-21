@@ -1,5 +1,8 @@
 <?php
-//weichengtech
+if (!(defined('IN_IA'))) {
+	exit('Access Denied');
+}
+
 class Ui_EweiShopV2Model
 {
 	public function lazy($html = '')
@@ -11,8 +14,5 @@ class Ui_EweiShopV2Model
 	}
 }
 
-if (!defined('IN_IA')) {
-	exit('Access Denied');
-}
 
 ?>

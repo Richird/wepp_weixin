@@ -1,6 +1,5 @@
 <?php
-//weichengtech
-if (!defined('IN_IA')) {
+if (!(defined('IN_IA'))) {
 	exit('Access Denied');
 }
 
@@ -12,14 +11,16 @@ class Index_EweiShopV2Page extends PluginMobileLoginPage
 		global $_GPC;
 		$set = $this->model->getSet();
 
-		if (!empty($set['sign_rule'])) {
+		if (!(empty($set['sign_rule']))) {
 			$set['sign_rule'] = iunserializer($set['sign_rule']);
 			$set['sign_rule'] = htmlspecialchars_decode($set['sign_rule']);
 		}
 
+
 		if (empty($set['isopen'])) {
 			$this->message($set['textsign'] . '未开启!', mobileUrl());
 		}
+
 
 		$month = $this->model->getMonth();
 		$member = m('member')->getMember($_W['openid']);
@@ -27,10 +28,11 @@ class Index_EweiShopV2Page extends PluginMobileLoginPage
 			$this->message('获取用户信息失败!', mobileUrl());
 		}
 
+
 		$calendar = $this->model->getCalendar();
 		$signinfo = $this->model->getSign();
 		$advaward = $this->model->getAdvAward();
-		$json_arr = array('calendar' => $calendar, 'signinfo' => $signinfo, 'advaward' => $advaward, 'year' => date('Y', time()), 'month' => date('m', time()), 'today' => date('d', time()), 'signed' => $signinfo['signed'], 'signold' => $set['signold'], 'signoldprice' => $set['signold_price'], 'signoldtype' => empty($set['signold_type']) ? $set['textmoney'] : $set['textcredit'], 'textsign' => $set['textsign'], 'textsigned' => $set['textsigned'], 'textsignold' => $set['textsignold'], 'textsignforget' => $set['textsignforget']);
+		$json_arr = array('calendar' => $calendar, 'signinfo' => $signinfo, 'advaward' => $advaward, 'year' => date('Y', time()), 'month' => date('m', time()), 'today' => date('d', time()), 'signed' => $signinfo['signed'], 'signold' => $set['signold'], 'signoldprice' => $set['signold_price'], 'signoldtype' => (empty($set['signold_type']) ? $set['textmoney'] : $set['textcredit']), 'textsign' => $set['textsign'], 'textsigned' => $set['textsigned'], 'textsignold' => $set['textsignold'], 'textsignforget' => $set['textsignforget']);
 		$json = json_encode($json_arr);
 		$this->model->setShare($set);
 		$texts = array('sign' => $set['textsign'], 'signed' => $set['textsigned'], 'signold' => $set['textsignold'], 'credit' => $set['textcredit'], 'color' => $set['maincolor']);
@@ -58,9 +60,10 @@ class Index_EweiShopV2Page extends PluginMobileLoginPage
 	{
 		global $_W;
 		global $_GPC;
-		if (!$_W['ispost'] || empty($_W['openid'])) {
+		if (!($_W['ispost']) || empty($_W['openid'])) {
 			show_json(0, '错误的请求!');
 		}
+
 
 		$set = $this->model->getSet();
 
@@ -68,81 +71,97 @@ class Index_EweiShopV2Page extends PluginMobileLoginPage
 			show_json(0, $set['textcredit'] . $set['textsign'] . '未开启!');
 		}
 
+
 		$date = trim($_GPC['date']);
-		$date = ($date == 'null' ? '' : $date);
+		$date = (($date == 'null' ? '' : $date));
 		$signinfo = $this->model->getSign($date);
 
-		if (!empty($date)) {
+		if (!(empty($date))) {
 			$datemonth = date('m', strtotime($date));
 			$thismonth = date('m', time());
 
 			if ($datemonth < $thismonth) {
 				show_json(0, $set['textsign'] . '月份小于当前月份!');
 			}
+
 		}
 
-		if (!empty($signinfo['signed'])) {
+
+		if (!(empty($signinfo['signed']))) {
 			show_json(2, '已经' . $set['textsign'] . '，不要重复' . $set['textsign'] . '哦~');
 		}
 
-		if (!empty($date) && (time() < strtotime($date))) {
+
+		if (!(empty($date)) && (time() < strtotime($date))) {
 			show_json(0, $set['textsign'] . '日期大于当前日期!');
 		}
+
 
 		$member = m('member')->getMember($_W['openid']);
 		$reword_special = iunserializer($set['reword_special']);
 		$credit = 0;
-		if (!empty($set['reward_default_day']) && (0 < $set['reward_default_day'])) {
+
+		if (!(empty($set['reward_default_day'])) && (0 < $set['reward_default_day'])) {
 			$credit = $set['reward_default_day'];
-			$message = (empty($date) ? '日常' . $set['textsign'] . '+' : $set['textsignold'] . '+');
+			$message = ((empty($date) ? '日常' . $set['textsign'] . '+' : $set['textsignold'] . '+'));
 			$message .= $set['reward_default_day'] . $set['textcredit'];
 		}
 
-		if (!empty($set['reward_default_first']) && (0 < $set['reward_default_first']) && empty($signinfo['sum']) && empty($date)) {
+
+		if (!(empty($set['reward_default_first'])) && (0 < $set['reward_default_first']) && empty($signinfo['sum']) && empty($date)) {
 			$credit = $set['reward_default_first'];
 			$message = '首次' . $set['textsign'] . '+' . $set['reward_default_first'] . $set['textcredit'];
 		}
 
-		if (!empty($reword_special) && empty($date)) {
-			foreach ($reword_special as $item) {
+
+		if (!(empty($reword_special)) && empty($date)) {
+			foreach ($reword_special as $item ) {
 				$day = date('Y-m-d', $item['date']);
 				$today = date('Y-m-d', time());
-				if (($day === $today) && !empty($item['credit'])) {
+
+				if (($day === $today) && !(empty($item['credit']))) {
 					$credit = $credit + $item['credit'];
 
-					if (!empty($message)) {
+					if (!(empty($message))) {
 						$message .= "\r\n";
 					}
 
-					$message .= (empty($item['title']) ? $today : $item['title']);
+
+					$message .= ((empty($item['title']) ? $today : $item['title']));
 					$message .= $set['textsign'] . '+' . $item['credit'] . $set['textcredit'];
 					break;
 				}
+
 			}
 		}
 
-		if (!empty($date) && !empty($set['signold']) && (0 < $set['signold_price'])) {
+
+		if (!(empty($date)) && !(empty($set['signold'])) && (0 < $set['signold_price'])) {
 			if (empty($set['signold_type'])) {
 				if ($member['credit2'] < $set['signold_price']) {
 					show_json(0, $set['textsignold'] . '失败! 您的' . $set['textmoney'] . '不足, 无法' . $set['textsignold']);
 				}
 
-				m('member')->setCredit($_W['openid'], 'credit2', 0 - $set['signold_price'], $set['textcredit'] . $set['textsign'] . ': ' . $set['textsignold'] . '扣除' . $set['signold_price'] . $set['textmoney']);
+
+				m('member')->setCredit($_W['openid'], 'credit2', -$set['signold_price'], $set['textcredit'] . $set['textsign'] . ': ' . $set['textsignold'] . '扣除' . $set['signold_price'] . $set['textmoney']);
 			}
-			else {
+			 else {
 				if ($member['credit1'] < $set['signold_price']) {
 					show_json(0, $set['textsignold'] . '失败! 您的' . $set['textcredit'] . '不足, 无法' . $set['textsignold']);
 				}
 
-				m('member')->setCredit($_W['openid'], 'credit1', 0 - $set['signold_price'], $set['textcredit'] . $set['textsign'] . ': ' . $set['textsignold'] . '扣除' . $set['signold_price'] . $set['textcredit']);
+
+				m('member')->setCredit($_W['openid'], 'credit1', -$set['signold_price'], $set['textcredit'] . $set['textsign'] . ': ' . $set['textsignold'] . '扣除' . $set['signold_price'] . $set['textcredit']);
 			}
 		}
 
-		if (!empty($credit) && (0 < $credit)) {
-			m('member')->setCredit($_W['openid'], 'credit1', 0 + $credit, $set['textcredit'] . $set['textsign'] . ': ' . $message);
+
+		if (!(empty($credit)) && (0 < $credit)) {
+			m('member')->setCredit($_W['openid'], 'credit1', +$credit, $set['textcredit'] . $set['textsign'] . ': ' . $message);
 		}
 
-		$arr = array('uniacid' => $_W['uniacid'], 'time' => empty($date) ? time() : strtotime($date), 'openid' => $_W['openid'], 'credit' => $credit, 'log' => $message);
+
+		$arr = array('uniacid' => $_W['uniacid'], 'time' => (empty($date) ? time() : strtotime($date)), 'openid' => $_W['openid'], 'credit' => $credit, 'log' => $message);
 		pdo_insert('ewei_shop_sign_records', $arr);
 		$signinfo = $this->model->getSign();
 		$member = m('member')->getMember($_W['openid']);
@@ -156,9 +175,10 @@ class Index_EweiShopV2Page extends PluginMobileLoginPage
 				p('lottery')->getLotteryList($member['openid'], array('lottery_id' => $res));
 			}
 
+
 			$result['lottery'] = p('lottery')->check_isreward();
 		}
-		else {
+		 else {
 			$result['lottery']['is_changes'] = 0;
 		}
 
@@ -169,9 +189,10 @@ class Index_EweiShopV2Page extends PluginMobileLoginPage
 	{
 		global $_W;
 		global $_GPC;
-		if (!$_W['ispost'] || empty($_W['openid'])) {
+		if (!($_W['ispost']) || empty($_W['openid'])) {
 			show_json(0, '错误的请求!');
 		}
+
 
 		$type = intval($_GPC['type']);
 		$day = intval($_GPC['day']);
@@ -179,54 +200,62 @@ class Index_EweiShopV2Page extends PluginMobileLoginPage
 			show_json(0, '请求参数错误!');
 		}
 
+
 		$set = $this->model->getSet();
 
 		if (empty($set['isopen'])) {
 			show_json(0, $set['textcredit'] . $set['textsign'] . '未开启!');
 		}
 
+
 		$reword_sum = iunserializer($set['reword_sum']);
 		$reword_order = iunserializer($set['reword_order']);
 		$condition = '';
 
-		if (!empty($set['cycle'])) {
+		if (!(empty($set['cycle']))) {
 			$month_start = mktime(0, 0, 0, date('m'), 1, date('Y'));
 			$month_end = mktime(23, 59, 59, date('m'), date('t'), date('Y'));
 			$condition .= ' and `time` between ' . $month_start . ' and ' . $month_end . ' ';
 		}
 
+
 		$record = pdo_fetch('select * from ' . tablename('ewei_shop_sign_records') . ' where openid=:openid and `type`=' . $type . ' and `day`=' . $day . ' and uniacid=:uniacid ' . $condition . ' limit 1 ', array(':uniacid' => $_W['uniacid'], ':openid' => $_W['openid']));
 
-		if (!empty($record)) {
+		if (!(empty($record))) {
 			show_json(0, '此奖励已经领取, 请不要重复领取!');
 		}
 
+
 		$credit = 0;
-		if (($type == 1) && !empty($reword_order)) {
-			foreach ($reword_order as $item) {
-				if (($item['day'] == $day) && !empty($item['credit'])) {
+
+		if (($type == 1) && !(empty($reword_order))) {
+			foreach ($reword_order as $item ) {
+				if (($item['day'] == $day) && !(empty($item['credit']))) {
 					$credit = $item['credit'];
 				}
+
 			}
 
 			$message = '连续' . $set['textsign'];
 		}
-		else {
-			if (($type == 2) && !empty($reword_sum)) {
-				foreach ($reword_sum as $item) {
-					if (($item['day'] == $day) && !empty($item['credit'])) {
-						$credit = $item['credit'];
-					}
+		 else if (($type == 2) && !(empty($reword_sum))) {
+			foreach ($reword_sum as $item ) {
+				if (($item['day'] == $day) && !(empty($item['credit']))) {
+					$credit = $item['credit'];
 				}
 
-				$message = '总' . $set['textsign'];
 			}
+
+			$message = '总' . $set['textsign'];
 		}
 
+
 		$message .= $day . '天获得奖励' . $credit . $set['textcredit'];
-		if (!empty($credit) && (0 < $credit)) {
-			m('member')->setCredit($_W['openid'], 'credit1', 0 + $credit, $set['textcredit'] . $set['textsign'] . ': ' . $message);
+
+		if (!(empty($credit)) && (0 < $credit)) {
+			m('member')->setCredit($_W['openid'], 'credit1', +$credit, $set['textcredit'] . $set['textsign'] . ': ' . $message);
 		}
+
 
 		$arr = array('uniacid' => $_W['uniacid'], 'time' => time(), 'openid' => $_W['openid'], 'credit' => $credit, 'log' => $message, 'type' => $type, 'day' => $day);
 		pdo_insert('ewei_shop_sign_records', $arr);
@@ -255,18 +284,20 @@ class Index_EweiShopV2Page extends PluginMobileLoginPage
 		$total = pdo_fetchcolumn($sql, $params);
 		$list = array();
 
-		if (!empty($total)) {
+		if (!(empty($total))) {
 			$sql = 'SELECT * FROM ' . tablename('ewei_shop_sign_records') . ' where 1 ' . $condition . ' ORDER BY `time` DESC LIMIT ' . (($pindex - 1) * $psize) . ',' . $psize;
 			$list = pdo_fetchall($sql, $params);
 
-			if (!empty($list)) {
-				foreach ($list as &$item) {
+			if (!(empty($list))) {
+				foreach ($list as &$item ) {
 					$item['date'] = date('Y-m-d H:i:s', $item['time']);
 				}
 
 				unset($item);
 			}
+
 		}
+
 
 		show_json(1, array('total' => $total, 'list' => $list, 'pagesize' => $psize));
 	}
@@ -290,38 +321,43 @@ class Index_EweiShopV2Page extends PluginMobileLoginPage
 		$list = array();
 		$psize = 10;
 
-		if (!empty($type)) {
+		if (!(empty($type))) {
 			$pindex = max(1, intval($_GPC['page']));
 			$condition = ' and su.uniacid=:uniacid and sm.uniacid=:uniacid ';
 			$conditioncol = ' and uniacid=:uniacid ';
 
-			if (!empty($set['cycle'])) {
+			if (!(empty($set['cycle']))) {
 				$condition .= ' and su.signdate="' . date('Y-m', time()) . '"';
 				$conditioncol .= ' and signdate="' . date('Y-m', time()) . '"';
 			}
+
 
 			$params = array(':uniacid' => $_W['uniacid']);
 			$sql = 'SELECT COUNT(*) FROM ' . tablename('ewei_shop_sign_user') . ' where 1 ' . $conditioncol;
 			$total = pdo_fetchcolumn($sql, $params);
 			$list = array();
 
-			if (!empty($total)) {
+			if (!(empty($total))) {
 				$type = 'su.' . $type;
 				$sql = 'SELECT su.*, sm.nickname, sm.avatar FROM ' . tablename('ewei_shop_sign_user') . ' su left join ' . tablename('ewei_shop_member') . ' sm on sm.openid=su.openid where 1 ' . $condition . ' ORDER BY ' . $type . ' DESC LIMIT ' . (($pindex - 1) * $psize) . ',' . $psize;
 				$list = pdo_fetchall($sql, $params);
 
-				if (!empty($list)) {
-					foreach ($list as &$item) {
+				if (!(empty($list))) {
+					foreach ($list as &$item ) {
 						$item['type'] = str_replace('su.', '', $type);
 					}
 
 					unset($item);
 				}
+
 			}
+
 		}
+
 
 		show_json(1, array('total' => $total, 'list' => $list, 'pagesize' => $psize));
 	}
 }
+
 
 ?>

@@ -1,8 +1,8 @@
 <?php
-//weichengtech
-if (!defined('IN_IA')) {
+if (!(defined('IN_IA'))) {
 	exit('Access Denied');
 }
+
 
 require_once IA_ROOT . '/addons/ewei_shopv2/version.php';
 require_once IA_ROOT . '/addons/ewei_shopv2/defines.php';
@@ -32,5 +32,6 @@ class Ewei_shopv2ModuleSite extends WeModuleSite
 		return m('order')->payResult($params);
 	}
 }
+
 
 ?>
